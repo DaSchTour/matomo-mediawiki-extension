@@ -22,7 +22,7 @@ $wgExtensionCredits['specialpage'][] = array(
 	'url'            => 'https://www.mediawiki.org/wiki/Extension:Piwik_Integration',
 );
 
-$dir = '/' . dirname(__FILE__);
+$dir = dirname(__FILE__) . '/';
 
 $wgAutoloadClasses['PiwikHooks'] = $dir . 'Piwik.hooks.php';
 
