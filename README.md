@@ -1,0 +1,2 @@
+piwik-mediawiki-extension
+=========================
