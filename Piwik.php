@@ -13,7 +13,7 @@ if ( !defined( 'MEDIAWIKI' ) ) {
 	die( 'This file is a MediaWiki extension, it is not a valid entry point' );
 }
 
-$wgExtensionCredits['specialpage'][] = array(
+$wgExtensionCredits['other'][] = array(
 	'path'           => __FILE__,
 	'name'           => 'Piwik Integration',
 	'version'        => '2.0.0',
