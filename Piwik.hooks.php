@@ -1,7 +1,7 @@
 <?php
 class PiwikHooks {
 	function PiwikSetup( $skin, &$text = '' ) {
-	$text .= efAddPiwik( $skin->getTitle() );
+	$text .= PiwikHooks::AddPiwik( $skin->getTitle() );
 	return true;
 	}
 
