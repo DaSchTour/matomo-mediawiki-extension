@@ -16,7 +16,7 @@ if ( !defined( 'MEDIAWIKI' ) ) {
 $wgExtensionCredits['other'][] = array(
 	'path'           => __FILE__,
 	'name'           => 'Piwik Integration',
-	'version'        => '2.0.1',
+	'version'        => '2.1.0',
 	'author'         => array('Isb1009', '[http://www.daschmedia.de DaSch]'),
 	'description'	 => 'Adding Piwik Tracking Code',
 	'url'            => 'https://www.mediawiki.org/wiki/Extension:Piwik_Integration',
@@ -35,4 +35,3 @@ $wgPiwikIgnoreBots = true;
 $wgPiwikCustomJS = "";
 $wgPiwikUsePageTitle = false;
 $wgPiwikActionName = "";
-$wgPiwikSpecialPageDate = 'yesterday';
