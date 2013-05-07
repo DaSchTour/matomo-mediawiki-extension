@@ -20,7 +20,8 @@ but ALL steps are necessary:
 
 * Create a folder called "piwik" in your extensions directory
 
-* Upload Piwik.php, Piwik.hooks.php, to the "piwik" folder you've just created
+* Upload Piwik.php, Piwik.i18n.php, Piwik_specialpage.php and Piwik.alias.php
+  to the "piwik" folder you've just created
 
 * Edit your LocalSettings.php and, at the end of the file, add the
   following:

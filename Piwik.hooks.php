@@ -1,29 +1,69 @@
 <?php
+
 class PiwikHooks {
-	function PiwikSetup( $skin, &$text = '' ) {
-	$text .= PiwikHooks::AddPiwik( $skin->getTitle() );
-	return true;
+	
+	/**
+	 * Initialize the Piwik Hook
+	 * 
+	 * @param string $skin
+	 * @param string $text
+	 * @return bool
+	 */
+	public static function PiwikSetup ($skin, &$text = '')
+	{
+		$text .= PiwikHooks::AddPiwik( $skin->getTitle() );
+		return true;
 	}
-
-	function AddPiwik( $title ) {
-	global $wgPiwikIDSite, $wgPiwikURL, $wgPiwikIgnoreSysops, $wgPiwikIgnoreBots, $wgUser, $wgScriptPath, $wgPiwikCustomJS, $wgPiwikActionName, $wgPiwikUsePageTitle;
-	if ( !$wgUser->isAllowed( 'bot' ) || !$wgPiwikIgnoreBots ) {
-		if ( !$wgUser->isAllowed( 'protect' ) || !$wgPiwikIgnoreSysops ) {
-			if ( !empty( $wgPiwikIDSite ) AND !empty( $wgPiwikURL ) ) {
-				if ( $wgPiwikUsePageTitle ) {
-					$wgPiwikPageTitle = $title->getPrefixedText();
-
-					$wgPiwikFinalActionName = $wgPiwikActionName;
-					$wgPiwikFinalActionName .= $wgPiwikPageTitle;
-				} else {
-					$wgPiwikFinalActionName = $wgPiwikActionName;
-				}
-				// Stop xss since page title's can have " and stuff in them.
-				$wgPiwikFinalActionName = Xml::encodeJsVar( $wgPiwikFinalActionName );
-				$funcOutput = <<<PIWIK
+	
+	/**
+	 * Add piwik script
+	 * @param string $title
+	 * @return string
+	 */
+	public static function AddPiwik ($title) {
+		
+		global $wgPiwikIDSite, $wgPiwikURL, $wgPiwikIgnoreSysops, 
+			   $wgPiwikIgnoreBots, $wgUser, $wgScriptPath, 
+			   $wgPiwikCustomJS, $wgPiwikActionName, $wgPiwikUsePageTitle,
+			   $wgPiwikDisableCookies;
+		
+		// Is piwik disabled for bots?
+		if ( $wgUser->isAllowed( 'bot' ) || $wgPiwikIgnoreBots ) {
+			return "<!-- Piwik extension is disabled for bots -->";
+		}
+		
+		// Ignore Wiki System Operators
+		if ( $wgUser->isAllowed( 'protect' ) || $wgPiwikIgnoreSysops ) {
+			return "<!-- Piwik tracking is disabled for users with 'protect' rights (i.e., sysops) -->";
+		}
+		
+		// Missing configuration parameters 
+		if ( empty( $wgPiwikIDSite ) AND empty( $wgPiwikURL ) ) {
+			return "<!-- You need to set the settings for Piwik -->";
+		}
+		
+		if ( $wgPiwikUsePageTitle ) {
+			$wgPiwikPageTitle = $title->getPrefixedText();
+		
+			$wgPiwikFinalActionName = $wgPiwikActionName;
+			$wgPiwikFinalActionName .= $wgPiwikPageTitle;
+		} else {
+			$wgPiwikFinalActionName = $wgPiwikActionName;
+		}
+		
+		// Check if disablecookies flag
+		if ($wgPiwikDisableCookies) {
+			$disableCookiesStr = PHP_EOL . '  _paq.push(["disableCookies"]);';
+		} else $disableCookiesStr = null;
+		
+		// Prevent XSS
+		$wgPiwikFinalActionName = Xml::encodeJsVar( $wgPiwikFinalActionName );
+		
+		// Piwik script
+		$script = <<<PIWIK
 <!-- Piwik -->
 <script type="text/javascript">
-  var _paq = _paq || [];
+  var _paq = _paq || [];{$disableCookiesStr}
   _paq.push(["trackPageView"]);
   _paq.push(["enableLinkTracking"]);
 
@@ -41,17 +81,11 @@ class PiwikHooks {
 <noscript><img src="http://{$wgPiwikURL}/piwik.php?idsite={$wgPiwikIDSite}&amp;rec=1" style="border:0" alt="" /></noscript>
 <!-- End Piwik -->
 PIWIK;
-			} else {
-				$funcOutput = "\n<!-- You need to set the settings for Piwik -->";
-			}
-		} else {
-			$funcOutput = "\n<!-- Piwik tracking is disabled for users with 'protect' rights (i.e., sysops) -->";
-		}
-	} else {
-		$funcOutput = "\n<!-- Piwik tracking is disabled for bots -->";
+		
+		return $script;
+		
 	}
-
-	return $funcOutput;	
-	}
+	
 }
+
 
