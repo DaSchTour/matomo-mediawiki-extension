@@ -5,6 +5,7 @@
  * @file
  * @ingroup Extensions
  * @author Isb1009 <isb1009 at gmail dot com>
+ * @author DaSch <dasch@daschmedia.de>
  * @author Youri van den Bogert <yvdbogert@archixl.nl>
  * @copyright © 2008-2010 Isb1009
  * @licence GNU General Public Licence 2.0
