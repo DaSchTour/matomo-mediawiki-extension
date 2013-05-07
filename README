@@ -69,8 +69,8 @@ but ALL steps are necessary:
 
 ** In case you want to include the title as, for example,
    "wiki/Title of the page", you can set $wgPiwikUsePageTitle to
-   true and set $wgPiwikActionName to "wiki/". The extension will print
+   true and set $wgPiwikActionName to "wiki/". The extension will print piwik_action_name = 'wiki/Title of the page';
 
 *** Since 2.2.0 its possible to disable cookies - set the $wgPiwikDisableCookies to true if you would like to disable them.
 
-			piwik_action_name = 'wiki/Title of the page';
+			
