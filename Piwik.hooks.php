@@ -56,6 +56,27 @@ class PiwikHooks {
 			$disableCookiesStr = PHP_EOL . '  _paq.push(["disableCookies"]);';
 		} else $disableCookiesStr = null;
 		
+		// Check if we have custom JS
+		if (!empty($wgPiwikCustomJS)) {
+			
+			// Check if array is given
+			// If yes we have multiple lines/variables to declare
+			if (is_array($wgPiwikCustomJS)) {
+				
+				// Make empty string with a new line
+				$customJs = PHP_EOL;
+				
+				// Store the lines in the $customJs line
+				foreach ($wgPiwikCustomJS as $customJsLine) { 
+					$customJs .= $customJsLine;
+				}
+			
+			// CustomJs is string
+			} else $customJs = PHP_EOL . $wgPiwikCustomJS;
+			
+		// Contents are empty
+		} else $customJs = null;
+		
 		// Prevent XSS
 		$wgPiwikFinalActionName = Xml::encodeJsVar( $wgPiwikFinalActionName );
 		
@@ -63,7 +84,7 @@ class PiwikHooks {
 		$script = <<<PIWIK
 <!-- Piwik -->
 <script type="text/javascript">
-  var _paq = _paq || [];{$disableCookiesStr}
+  var _paq = _paq || [];{$disableCookiesStr}{$customJs}
   _paq.push(["trackPageView"]);
   _paq.push(["enableLinkTracking"]);
 
