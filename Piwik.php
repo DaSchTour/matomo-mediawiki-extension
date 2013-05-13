@@ -8,11 +8,10 @@
  * @author Youri van den Bogert <yvdbogert@archixl.nl>
  * @copyright © 2008-2010 Isb1009
  * @licence GNU General Public Licence 2.0
+ * @package Extensions
  */
 
-if ( !defined( 'MEDIAWIKI' ) ) {
-	die( 'This file is a MediaWiki extension, it is not a valid entry point' );
-}
+if ( !defined( 'MEDIAWIKI' ) ) die( 'This file is a MediaWiki extension, it is not a valid entry point' );
 
 $wgExtensionCredits['other'][] = array(
 	'path'           => __FILE__,
