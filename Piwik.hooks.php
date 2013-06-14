@@ -28,17 +28,17 @@ class PiwikHooks {
 			   $wgPiwikDisableCookies;
 		
 		// Is piwik disabled for bots?
-		if ( $wgUser->isAllowed( 'bot' ) || $wgPiwikIgnoreBots ) {
+		if ( $wgUser->isAllowed( 'bot' ) && $wgPiwikIgnoreBots ) {
 			return "<!-- Piwik extension is disabled for bots -->";
 		}
 		
 		// Ignore Wiki System Operators
-		if ( $wgUser->isAllowed( 'protect' ) || $wgPiwikIgnoreSysops ) {
+		if ( $wgUser->isAllowed( 'protect' ) && $wgPiwikIgnoreSysops ) {
 			return "<!-- Piwik tracking is disabled for users with 'protect' rights (i.e., sysops) -->";
 		}
 		
 		// Missing configuration parameters 
-		if ( empty( $wgPiwikIDSite ) AND empty( $wgPiwikURL ) ) {
+		if ( empty( $wgPiwikIDSite ) || empty( $wgPiwikURL ) ) {
 			return "<!-- You need to set the settings for Piwik -->";
 		}
 		
