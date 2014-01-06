@@ -17,7 +17,7 @@ if ( !defined( 'MEDIAWIKI' ) ) die( 'This file is a MediaWiki extension, it is n
 $wgExtensionCredits['other'][] = array(
 	'path'           => __FILE__,
 	'name'           => 'Piwik Integration',
-	'version'        => '2.2.2',
+	'version'        => '2.3.0',
 	'author'         => array('Isb1009', '[http://www.daschmedia.de DaSch]', '[https://github.com/YOUR1 Youri van den Bogert]'),
 	'description'	 => 'Adding Piwik Tracking Code',
 	'url'            => 'https://www.mediawiki.org/wiki/Extension:Piwik_Integration',
@@ -37,3 +37,8 @@ $wgPiwikCustomJS = "";
 $wgPiwikUsePageTitle = false;
 $wgPiwikActionName = "";
 $wgPiwikDisableCookies = false;
+// Allowed values: auto, http or https
+// If the value is set to auto the server will use the currently set protocol.
+// Note; if you set this to https, make sure your PIWIK server has a valid certificate!
+$wgPiwikProtocol = 'auto'; // Allowed values: auto, http, or https.
+

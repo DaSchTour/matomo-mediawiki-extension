@@ -25,7 +25,7 @@ class PiwikHooks {
 		global $wgPiwikIDSite, $wgPiwikURL, $wgPiwikIgnoreSysops, 
 			   $wgPiwikIgnoreBots, $wgUser, $wgScriptPath, 
 			   $wgPiwikCustomJS, $wgPiwikActionName, $wgPiwikUsePageTitle,
-			   $wgPiwikDisableCookies;
+			   $wgPiwikDisableCookies, $wgPiwikProtocol;
 		
 		// Is piwik disabled for bots?
 		if ( $wgUser->isAllowed( 'bot' ) && $wgPiwikIgnoreBots ) {
@@ -77,6 +77,17 @@ class PiwikHooks {
 		// Contents are empty
 		} else $customJs = null;
 		
+		// Check if server uses https
+		if ($wgPiwikProtocol == 'auto') {
+			
+			if (isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] == 'on' || $_SERVER['HTTPS'] == 1) || isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https') {
+				$wgPiwikProtocol = 'https';
+			} else {
+				$wgPiwikProtocol = 'http';
+			}
+			
+		}
+		
 		// Prevent XSS
 		$wgPiwikFinalActionName = Xml::encodeJsVar( $wgPiwikFinalActionName );
 		
@@ -99,7 +110,7 @@ class PiwikHooks {
 <!-- End Piwik Code -->
 
 <!-- Piwik Image Tracker -->
-<noscript><img src="http://{$wgPiwikURL}/piwik.php?idsite={$wgPiwikIDSite}&amp;rec=1" style="border:0" alt="" /></noscript>
+<noscript><img src="{$wgPiwikProtocol}://{$wgPiwikURL}/piwik.php?idsite={$wgPiwikIDSite}&amp;rec=1" style="border:0" alt="" /></noscript>
 <!-- End Piwik -->
 PIWIK;
 		
@@ -108,5 +119,6 @@ PIWIK;
 	}
 	
 }
+
 
 
