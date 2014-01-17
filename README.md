@@ -1,7 +1,7 @@
 MediaWiki Piwik Integration extension
 ===========================
-Version 2.2.1
- - Last update: 8 may 2013
+Version 2.2.4
+ - Last update: 17 january 2014 (added Composer support)
 
 This is the README file for the Piwik Integration extension for MediaWiki
 software. The extension is only useful if you've got a MediaWiki
