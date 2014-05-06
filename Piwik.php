@@ -37,5 +37,5 @@ $GLOBALS['wgPiwikCustomJS'] = "";
 $GLOBALS['wgPiwikUsePageTitle'] = false;
 $GLOBALS['wgPiwikActionName'] = "";
 $GLOBALS['wgPiwikDisableCookies'] = false;
-$GLOBALS['$wgPiwikProtocol'] = 'auto';
+$GLOBALS['wgPiwikProtocol'] = 'auto';
 
