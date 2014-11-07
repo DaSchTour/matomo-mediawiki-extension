@@ -29,7 +29,7 @@
                         "email": "youri@vandenbogert.eu",
                         "homepage": "https://github.com/YOUR1",
                         "role": "Developer"
-                },
+                }
         ],
 	"require": {
 		"php": ">=5.3.0",
