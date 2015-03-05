@@ -26,7 +26,8 @@ class PiwikHooks {
 			   $wgPiwikIgnoreBots, $wgUser, $wgScriptPath, 
 			   $wgPiwikCustomJS, $wgPiwikActionName, $wgPiwikUsePageTitle,
 			   $wgPiwikDisableCookies, $wgPiwikProtocol,
-         $wgPiwikTrackUsernames;
+			   $wgPiwikTrackUsernames,
+			   $wgPiwikJSFileURL, $wgPiwikPHPFileURL;
 		
 		// Is piwik disabled for bots?
 		if ( $wgUser->isAllowed( 'bot' ) && $wgPiwikIgnoreBots ) {
@@ -99,7 +100,21 @@ class PiwikHooks {
 		
 		// Prevent XSS
 		$wgPiwikFinalActionName = Xml::encodeJsVar( $wgPiwikFinalActionName );
-		
+
+		$protocolJs = '(("https:" == document.location.protocol) ? "https" : "http") + "://"';
+		if (empty($wgPiwikJSFileURL) && empty($wgPiwikPHPFileURL)) {
+			$defProtocol = '';
+			$defPhpTrackerUrl = "var u=$protocolJs + \"$wgPiwikURL/\";"
+				." _paq.push([\"setTrackerUrl\", u+\"piwik.php\"]);";
+			$jsTrackerUrlQuoted = "u+\"piwik.js\"";
+		} else {
+			$defProtocol = "var u=$protocolJs;";
+			$defPhpTrackerUrl = "_paq.push([\"setTrackerUrl\", "
+				. 'u+"' . (empty($wgPiwikPHPFileURL) ? "$wgPiwikURL/piwik.php" : $wgPiwikPHPFileURL ) ."\"]);";
+			$jsTrackerUrlQuoted = 'u+"' . (empty($wgPiwikJSFileURL) ? "$wgPiwikURL/piwik.js" : $wgPiwikJSFileURL) . '"';
+		}
+		$imgTrackerUrl = "$wgPiwikProtocol://" . (empty($wgPiwikPHPFileURL) ? "$wgPiwikURL/piwik.php" : $wgPiwikPHPFileURL);
+
 		// Piwik script
 		$script = <<<PIWIK
 <!-- Piwik -->
@@ -109,17 +124,16 @@ class PiwikHooks {
   _paq.push(["enableLinkTracking"]);
 
   (function() {
-    var u=(("https:" == document.location.protocol) ? "https" : "http") + "://{$wgPiwikURL}/";
-    _paq.push(["setTrackerUrl", u+"piwik.php"]);
+    {$defProtocol}{$defPhpTrackerUrl}
     _paq.push(["setSiteId", "{$wgPiwikIDSite}"]);
     var d=document, g=d.createElement("script"), s=d.getElementsByTagName("script")[0]; g.type="text/javascript";
-    g.defer=true; g.async=true; g.src=u+"piwik.js"; s.parentNode.insertBefore(g,s);
+    g.defer=true; g.async=true; g.src={$jsTrackerUrlQuoted}; s.parentNode.insertBefore(g,s);
   })();
 </script>
 <!-- End Piwik Code -->
 
 <!-- Piwik Image Tracker -->
-<noscript><img src="{$wgPiwikProtocol}://{$wgPiwikURL}/piwik.php?idsite={$wgPiwikIDSite}&amp;rec=1" style="border:0" alt="" /></noscript>
+<noscript><img src="{$imgTrackerUrl}?idsite={$wgPiwikIDSite}&amp;rec=1" style="border:0" alt="" /></noscript>
 <!-- End Piwik -->
 PIWIK;
 		
