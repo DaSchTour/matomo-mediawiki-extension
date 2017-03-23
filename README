@@ -65,5 +65,5 @@ Custom variables
    "wiki/Title of the page", you can set ```$wgPiwikUsePageTitle``` to
   ```true``` and set ```$wgPiwikActionName``` to ```wiki/```. The extension will print piwik_action_name = 'wiki/Title of the page';
 
-* If you want to track the username of the visitor, set the
-  ```$wgPiwikTrackUsernames``` to true in LocalSettings.php.
+* If you want to track the username of the visitor with the piwik feature User ID (needs Piwik >= 2.7.0) 
+  set the ```$wgPiwikTrackUsernames``` to true in LocalSettings.php.
