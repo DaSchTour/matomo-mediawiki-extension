@@ -26,7 +26,7 @@ class PiwikHooks {
 			   $wgPiwikIgnoreBots, $wgUser, $wgScriptPath, 
 			   $wgPiwikCustomJS, $wgPiwikActionName, $wgPiwikUsePageTitle,
 			   $wgPiwikDisableCookies, $wgPiwikProtocol,
-               $wgPiwikUsernameCustomVariable, $wgUser;
+         $wgPiwikTrackUsernames;
 		
 		// Is piwik disabled for bots?
 		if ( $wgUser->isAllowed( 'bot' ) && $wgPiwikIgnoreBots ) {
@@ -78,20 +78,12 @@ class PiwikHooks {
 		// Contents are empty
 		} else $customJs = null;
 
-        // Set a custom variable for the user name if it's been configured for
-        // the extension and the user is logged in. The user name for
-        // anonymous visitors is their IP address which Piwik already records.
-        if (!empty($wgPiwikUsernameCustomVariable) &&
-            is_array($wgPiwikUsernameCustomVariable) &&
-            count($wgPiwikUsernameCustomVariable) == 2 &&
-            $wgUser->isLoggedIn()) {
-
-            $index = $wgPiwikUsernameCustomVariable[0];
-            $name = $wgPiwikUsernameCustomVariable[1];
-
+        // Track username based on https://piwik.org/docs/user-id/ The user
+        // name for anonymous visitors is their IP address which Piwik already
+        // records.
+        if ($wgPiwikTrackUsernames && $wgUser->isLoggedIn()) {
             $username = $wgUser->getName();
-
-            $customJs .= PHP_EOL . "  _paq.push(['setCustomVariable',{$index},'{$name}','{$username}']);";
+            $customJs .= PHP_EOL . "  _paq.push(['setUserId','{$username}']);";
         }
 
 		// Check if server uses https
