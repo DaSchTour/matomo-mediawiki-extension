@@ -82,8 +82,8 @@ class PiwikHooks {
         // name for anonymous visitors is their IP address which Piwik already
         // records.
         if ($wgPiwikTrackUsernames && $wgUser->isLoggedIn()) {
-            $username = $wgUser->getName();
-            $customJs .= PHP_EOL . "  _paq.push(['setUserId','{$username}']);";
+            $username = Xml::encodeJsVar( $wgUser->getName() );
+            $customJs .= PHP_EOL . "  _paq.push([\"setUserId\",{$username}]);";
         }
 
 		// Check if server uses https
