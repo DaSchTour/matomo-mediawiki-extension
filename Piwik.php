@@ -12,31 +12,14 @@
  * @package Extensions
  */
 
-if ( !defined( 'MEDIAWIKI' ) ) die( 'This file is a MediaWiki extension, it is not a valid entry point' );
-
-$GLOBALS['wgExtensionCredits']['other'][] = array(
-	'path'           => __FILE__,
-	'name'           => 'Piwik Integration',
-	'version'        => '2.4.2',
-	'author'         => array('Isb1009', '[http://www.daschmedia.de DaSch]', '[https://github.com/YOUR1 Youri van den Bogert]'),
-	'description'    => 'Adding Piwik Tracking Code',
-	'url'            => 'https://www.mediawiki.org/wiki/Extension:Piwik_Integration',
-);
-
-$dir = dirname(__FILE__) . '/';
-
-$GLOBALS['wgAutoloadClasses']['PiwikHooks'] = $dir . 'Piwik.hooks.php';
-
-$GLOBALS['wgHooks']['SkinAfterBottomScripts'][]  = 'PiwikHooks::PiwikSetup';
-
-$GLOBALS['wgPiwikIDSite'] = "";
-$GLOBALS['wgPiwikURL'] = "";
-$GLOBALS['wgPiwikIgnoreSysops'] = true;
-$GLOBALS['wgPiwikIgnoreBots'] = true;
-$GLOBALS['wgPiwikCustomJS'] = "";
-$GLOBALS['wgPiwikUsePageTitle'] = false;
-$GLOBALS['wgPiwikActionName'] = "";
-$GLOBALS['wgPiwikDisableCookies'] = false;
-$GLOBALS['wgPiwikProtocol'] = 'auto';
-$GLOBALS['wgPiwikUsernameCustomVariable'] = array();
-
+if ( function_exists( 'wfLoadExtension' ) ) {
+	wfLoadExtension( 'Piwik' );
+	/* wfWarn(
+		'Deprecated PHP entry point used for Piwik extension. ' .
+		'Please use wfLoadExtension instead, ' .
+		'see https://www.mediawiki.org/wiki/Extension_registration for more details.'
+	); */
+	return true;
+} else {
+	die( 'This version of the Piwik extension requires MediaWiki 1.25+' );
+}

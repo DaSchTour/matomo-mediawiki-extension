@@ -1,0 +1,37 @@
+{
+	"name": "Piwik Integration",
+	"version": "3.0.0",
+	"author": [
+		"Isb1009",
+		"[http://www.daschmedia.de DaSch]",
+		"[https://github.com/YOUR1 Youri van den Bogert]"
+	],
+	"url": "https://www.mediawiki.org/wiki/Extension:Piwik_Integration",
+	"description": "Adding Piwik Tracking Code",
+	"license-name": "GPL-2.0+",
+	"type": "other",
+	"requires": {
+		"MediaWiki": ">= 1.25.0"
+	},
+	"config": {
+		"PiwikIDSite": "",
+		"PiwikURL": "",
+		"PiwikIgnoreSysops": true,
+		"PiwikIgnoreBots": true,
+		"PiwikCustomJS": "",
+		"PiwikUsePageTitle": false,
+		"PiwikActionName": "",
+		"PiwikDisableCookies": false,
+		"PiwikProtocol": "auto",
+		"PiwikUsernameCustomVariable": []
+	},
+	"Hooks": {
+		"SkinAfterBottomScripts": [
+			"PiwikHooks::PiwikSetup"
+		]
+	},
+	"AutoloadClasses": {
+		"PiwikHooks": "Piwik.hooks.php"
+	},
+	"manifest_version": 1
+}
