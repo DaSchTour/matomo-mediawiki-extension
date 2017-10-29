@@ -28,6 +28,8 @@ $dir = dirname(__FILE__) . '/';
 $GLOBALS['wgAutoloadClasses']['PiwikHooks'] = $dir . 'Piwik.hooks.php';
 
 $GLOBALS['wgHooks']['SkinAfterBottomScripts'][]  = 'PiwikHooks::PiwikSetup';
+$GLOBALS['wgHooks']['SpecialSearchResults'][]  = 'PiwikHooks::onSpecialSearchResults';
+$GLOBALS['wgHooks']['SpecialSearchSetupEngine'][]  = 'PiwikHooks::onSpecialSearchSetupEngine';
 
 $GLOBALS['wgPiwikIDSite'] = "";
 $GLOBALS['wgPiwikURL'] = "";
