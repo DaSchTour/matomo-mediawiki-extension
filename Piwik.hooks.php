@@ -26,7 +26,7 @@ class PiwikHooks {
 			   $wgPiwikIgnoreBots, $wgUser, $wgScriptPath, 
 			   $wgPiwikCustomJS, $wgPiwikActionName, $wgPiwikUsePageTitle,
 			   $wgPiwikDisableCookies, $wgPiwikProtocol,
-         $wgPiwikTrackUsernames;
+			   $wgPiwikTrackUsernames, $wgPiwikJSFileURL;
 		
 		// Is piwik disabled for bots?
 		if ( $wgUser->isAllowed( 'bot' ) && $wgPiwikIgnoreBots ) {
@@ -100,6 +100,18 @@ class PiwikHooks {
 		// Prevent XSS
 		$wgPiwikFinalActionName = Xml::encodeJsVar( $wgPiwikFinalActionName );
 		
+		// If $wgPiwikJSFileURL is null the locations are $wgPiwikURL/piwik.php and $wgPiwikURL/piwik.js
+		// Else they are $wgPiwikURL/piwik.php and $wgPiwikJSFileURL
+		$jsPiwikURL = '';
+		$jsPiwikURLCommon = '';
+		if( is_null( $wgPiwikJSFileURL ) ) {
+			$wgPiwikJSFileURL = 'piwik.js';
+			$jsPiwikURLCommon = '+' . Xml::encodeJsVar( $wgPiwikURL . '/' );
+		} else {
+			$jsPiwikURL = '+' . Xml::encodeJsVar( $wgPiwikURL . '/' );
+		}
+		$jsPiwikJSFileURL = Xml::encodeJsVar( $wgPiwikJSFileURL );
+
 		// Piwik script
 		$script = <<<PIWIK
 <!-- Piwik -->
@@ -109,11 +121,11 @@ class PiwikHooks {
   _paq.push(["enableLinkTracking"]);
 
   (function() {
-    var u=(("https:" == document.location.protocol) ? "https" : "http") + "://{$wgPiwikURL}/";
-    _paq.push(["setTrackerUrl", u+"piwik.php"]);
+    var u = (("https:" == document.location.protocol) ? "https" : "http") + "://"{$jsPiwikURLCommon};
+    _paq.push(["setTrackerUrl", u{$jsPiwikURL}+"piwik.php"]);
     _paq.push(["setSiteId", "{$wgPiwikIDSite}"]);
     var d=document, g=d.createElement("script"), s=d.getElementsByTagName("script")[0]; g.type="text/javascript";
-    g.defer=true; g.async=true; g.src=u+"piwik.js"; s.parentNode.insertBefore(g,s);
+    g.defer=true; g.async=true; g.src=u+{$jsPiwikJSFileURL}; s.parentNode.insertBefore(g,s);
   })();
 </script>
 <!-- End Piwik Code -->

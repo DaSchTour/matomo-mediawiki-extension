@@ -39,4 +39,5 @@ $GLOBALS['wgPiwikActionName'] = "";
 $GLOBALS['wgPiwikDisableCookies'] = false;
 $GLOBALS['wgPiwikProtocol'] = 'auto';
 $GLOBALS['wgPiwikUsernameCustomVariable'] = array();
+$GLOBALS['wgPiwikJSFileURL'] = null;
 
