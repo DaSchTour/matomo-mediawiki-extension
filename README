@@ -1,7 +1,7 @@
 MediaWiki Piwik Integration extension
 ===========================
-Version 2.4.2
- - Last update: 8 Nov 2014
+Version 2.4.4
+ - Last update: 30 Nov 2017
 
 This is the README file for the Piwik Integration extension for MediaWiki
 software. The extension is only useful if you've got a MediaWiki
@@ -19,14 +19,14 @@ Installation instructions
 Please, read them carefully. They're not very difficult to understand,
 but **ALL** steps are necessary:
 
-1. Create a folder called "piwik" in your extensions directory
+1. Create a folder called "Piwik" in your extensions directory
 
-2. Upload Piwik.php, Piwik.hooks.php, to the "piwik" folder you've just created
+2. Upload Piwik.php, Piwik.hooks.php, to the "Piwik" folder you've just created
 
 3. Edit your LocalSettings.php and, at the end of the file, add the
   following:
 
-        ```require_once('/extensions/piwik/Piwik.php');```
+        ```require_once "$IP/extensions/Piwik/Piwik.php";```
 
 
 4. Configure the Piwik URL and site-id. To do so; edit the LocalSettings and set up the following variables:
