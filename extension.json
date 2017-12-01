@@ -29,6 +29,12 @@
 	"Hooks": {
 		"SkinAfterBottomScripts": [
 			"PiwikHooks::PiwikSetup"
+		],
+		"SpecialSearchResults": [
+			"PiwikHooks::onSpecialSearchResults"
+		],
+		"SpecialSearchSetupEngine": [
+			"PiwikHooks::onSpecialSearchSetupEngine"
 		]
 	},
 	"AutoloadClasses": {
