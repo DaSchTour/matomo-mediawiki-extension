@@ -24,6 +24,7 @@
 		"PiwikDisableCookies": false,
 		"PiwikProtocol": "auto",
 		"PiwikUsernameCustomVariable": [],
+		"PiwikTrackUsernames": false,
 		"PiwikJSFileURL": null
 	},
 	"Hooks": {
