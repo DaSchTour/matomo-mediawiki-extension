@@ -7,7 +7,7 @@
 		"MediaWiki"
 	],
 	"homepage": "https://www.mediawiki.org/wiki/Extension:Piwik_Integration",
-	"license": "GPL-2.0+",
+	"license": "GPL-2.0-or-later",
 	"support": {
 		"issues": "https://github.com/DaSchTour/piwik-mediawiki-extension/issues",
 		"source": "https://github.com/DaSchTour/piwik-mediawiki-extension"
