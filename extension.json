@@ -1,6 +1,6 @@
 {
 	"name": "Piwik Integration",
-	"version": "3.0.0",
+	"version": "3.1.0",
 	"author": [
 		"Isb1009",
 		"[http://www.daschmedia.de DaSch]",
@@ -30,6 +30,12 @@
 	"Hooks": {
 		"SkinAfterBottomScripts": [
 			"PiwikHooks::PiwikSetup"
+		],
+		"SpecialSearchResults": [
+			"PiwikHooks::onSpecialSearchResults"
+		],
+		"SpecialSearchSetupEngine": [
+			"PiwikHooks::onSpecialSearchSetupEngine"
 		]
 	},
 	"AutoloadClasses": {

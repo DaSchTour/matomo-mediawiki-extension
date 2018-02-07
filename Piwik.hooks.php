@@ -2,6 +2,15 @@
 
 class PiwikHooks {
 	
+	/** @var string|null Searched term in Special:Search. */
+	public static $searchTerm = null;
+
+	/** @var string|null Search profile in Special:Search (search category in Piwik vocabulary). */
+	public static $searchProfile = null;
+
+	/** @var int|null Number of results in Special:Search. */
+	public static $searchCount = null;
+
 	/**
 	 * Initialize the Piwik Hook
 	 * 
@@ -15,6 +24,39 @@ class PiwikHooks {
 		return true;
 	}
 	
+	/**
+	 * Hook to save some data in Special:Search.
+	 *
+	 * @param string $term Searched term.
+	 * @param SearchResultSet|null $titleMatches Results in the titles.
+	 * @param SearchResultSet|null $textMatches Results in the fulltext.
+	 * @return true
+	 */
+	public static function onSpecialSearchResults( $term, $titleMatches, $textMatches ) {
+		self::$searchTerm = $term;
+		self::$searchCount = 0;
+		if( $titleMatches instanceof SearchResultSet ) {
+			self::$searchCount += (int) $titleMatches->numRows();
+		}
+		if( $textMatches instanceof SearchResultSet ) {
+			self::$searchCount += (int) $textMatches->numRows();
+		}
+		return true;
+	}
+
+	/**
+	 * Hook to save some data in Special:Search.
+	 *
+	 * @param SpecialSearch $search Special page.
+	 * @param string|null $profile Search profile.
+	 * @param SearchEngine $engine Search engine.
+	 * @return true
+	 */
+	public static function onSpecialSearchSetupEngine( $search, $profile, $engine ) {
+		self::$searchProfile = $profile;
+		return true;
+	}
+
 	/**
 	 * Add piwik script
 	 * @param string $title
@@ -78,6 +120,29 @@ class PiwikHooks {
 		// Contents are empty
 		} else $customJs = null;
 
+	// Track search results
+	$trackingType = 'trackPageView';
+	$jsTrackingSearch = '';
+	$urlTrackingSearch = '';
+	if( !is_null( self::$searchTerm ) ) {
+		// JavaScript
+		$trackingType = 'trackSiteSearch';
+		$jsTerm = Xml::encodeJsVar( self::$searchTerm );
+		$jsCategory = is_null( self::$searchProfile ) ? 'false' : Xml::encodeJsVar( self::$searchProfile );
+		$jsResultsCount = is_null( self::$searchCount ) ? 'false' : self::$searchCount;
+		$jsTrackingSearch = ",$jsTerm,$jsCategory,$jsResultsCount";
+
+		// URL
+		$urlTrackingSearch = [ 'search' => self::$searchTerm ];
+		if( !is_null( self::$searchProfile ) ) {
+			$urlTrackingSearch += [ 'search_cat' => self::$searchProfile ];
+		}
+		if( !is_null( self::$searchCount ) ) {
+			$urlTrackingSearch += [ 'search_count' => self::$searchCount ];
+		}
+		$urlTrackingSearch = '&' . wfArrayToCgi( $urlTrackingSearch );
+	}
+
         // Track username based on https://piwik.org/docs/user-id/ The user
         // name for anonymous visitors is their IP address which Piwik already
         // records.
@@ -117,7 +182,7 @@ class PiwikHooks {
 <!-- Piwik -->
 <script type="text/javascript">
   var _paq = _paq || [];{$disableCookiesStr}{$customJs}
-  _paq.push(["trackPageView"]);
+  _paq.push(["{$trackingType}"{$jsTrackingSearch}]);
   _paq.push(["enableLinkTracking"]);
 
   (function() {
@@ -131,7 +196,7 @@ class PiwikHooks {
 <!-- End Piwik Code -->
 
 <!-- Piwik Image Tracker -->
-<noscript><img src="{$wgPiwikProtocol}://{$wgPiwikURL}/piwik.php?idsite={$wgPiwikIDSite}&amp;rec=1" style="border:0" alt="" /></noscript>
+<noscript><img src="{$wgPiwikProtocol}://{$wgPiwikURL}/piwik.php?idsite={$wgPiwikIDSite}&rec=1{$urlTrackingSearch}" style="border:0" alt="" /></noscript>
 <!-- End Piwik -->
 PIWIK;
 		
@@ -140,6 +205,3 @@ PIWIK;
 	}
 	
 }
-
-
-
