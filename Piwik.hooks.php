@@ -65,21 +65,25 @@ class PiwikHooks {
 	public static function AddPiwik ($title) {
 		
 		global $wgPiwikIDSite, $wgPiwikURL, $wgPiwikIgnoreSysops, 
-			   $wgPiwikIgnoreBots, $wgUser, $wgScriptPath, 
-			   $wgPiwikCustomJS, $wgPiwikActionName, $wgPiwikUsePageTitle,
-			   $wgPiwikDisableCookies, $wgPiwikProtocol,
+			   $wgPiwikIgnoreBots, $wgPiwikIgnoreEditors, $wgUser,
+			   $wgScriptPath, $wgPiwikCustomJS, $wgPiwikActionName,
+			   $wgPiwikUsePageTitle, $wgPiwikDisableCookies, $wgPiwikProtocol,
 			   $wgPiwikTrackUsernames, $wgPiwikJSFileURL;
 		
 		// Is piwik disabled for bots?
 		if ( $wgUser->isAllowed( 'bot' ) && $wgPiwikIgnoreBots ) {
 			return "<!-- Piwik extension is disabled for bots -->";
 		}
-		
+
 		// Ignore Wiki System Operators
 		if ( $wgUser->isAllowed( 'protect' ) && $wgPiwikIgnoreSysops ) {
 			return "<!-- Piwik tracking is disabled for users with 'protect' rights (i.e., sysops) -->";
 		}
-		
+		// Ignore Wiki Editors
+		if ( $wgUser->isAllowed( 'edit' ) && $wgPiwikIgnoreEditors ) {
+			return "<!-- Piwik tracking is disabled for users with 'edit' rights -->";
+		}
+
 		// Missing configuration parameters 
 		if ( empty( $wgPiwikIDSite ) || empty( $wgPiwikURL ) ) {
 			return "<!-- You need to set the settings for Piwik -->";
