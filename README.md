@@ -48,9 +48,10 @@ Custom variables
 ------------------------
 * Disable cookies by setting  the ```$wgPiwikDisableCookies``` variable to ```false```.
   > For example: $wgPiwikDsiableCookies = false;
-* Ignore regular editors: $wgPiwikIgnoreEditors = true
-* Ignore Bots: $wgPiwikIgnoreBots = true
-* Ignore sysop users: $wgPiwikIgnoreSysops = true
+
+* Ignore regular editors: set ```$wgPiwikIgnoreEditors``` to  ```true```
+* Ignore Bots: set ```$wgPiwikIgnoreBots``` to ```true```
+* Ignore sysop users: set ```$wgPiwikIgnoreSysops``` to ```true```
 
 * To define custom javascript tags in the Piwik javascript code, its possible to define the $wgPiwikCustomJS variable. For example if you have a single setting to insert; use the following code:
    > ```$wgPiwikCustomJS = "_paq.push(['trackGoal', '1']);"```
