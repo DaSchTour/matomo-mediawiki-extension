@@ -1,12 +1,13 @@
 {
-	"name": "mediawiki/piwik-integration",
+	"name": "mediawiki/matomo",
 	"type": "mediawiki-extension",
-	"description": "The Piwik Integration extension inserts your Piwik tracking code to the bottom of every page.",
+	"description": "The Matomo (ex-Piwik) extension inserts your Matomo tracking code to the bottom of every page.",
 	"keywords": [
 		"Piwik",
+		"Matomo",
 		"MediaWiki"
 	],
-	"homepage": "https://www.mediawiki.org/wiki/Extension:Piwik_Integration",
+	"homepage": "https://www.mediawiki.org/wiki/Extension:Matomo",
 	"license": "GPL-2.0-or-later",
 	"support": {
 		"issues": "https://github.com/DaSchTour/piwik-mediawiki-extension/issues",
@@ -25,6 +26,11 @@
                         "role": "Developer"
                 },
                 {
+                        "name": "Seb35",
+                        "homepage": "https://www.seb35.fr",
+                        "role": "Developer"
+                },
+                {
                         "name": "Youri van den Bogert",
                         "email": "youri@vandenbogert.eu",
                         "homepage": "https://github.com/YOUR1",
@@ -36,11 +42,8 @@
 		"composer/installers": "1.*,>=1.0.1"
 	},
 	"autoload": {
-		"files" : [
-			"Piwik.php"
-		],
 		"classmap": [
-			"Piwik.hooks.php"
+			"Matomo.hooks.php"
 		]
 	}
 }

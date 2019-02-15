@@ -1,7 +1,7 @@
 <?php
 
-class PiwikHooks {
-	
+class MatomoHooks {
+
 	/** @var string|null Searched term in Special:Search. */
 	public static $searchTerm = null;
 
@@ -12,18 +12,34 @@ class PiwikHooks {
 	public static $searchCount = null;
 
 	/**
-	 * Initialize the Piwik Hook
+	 * Initialize the Matomo hook
 	 * 
 	 * @param string $skin
 	 * @param string $text
 	 * @return bool
 	 */
-	public static function PiwikSetup ($skin, &$text = '')
+	public static function MatomoSetup ($skin, &$text = '')
 	{
-		$text .= PiwikHooks::AddPiwik( $skin->getTitle() );
+		$text .= self::addMatomo( $skin->getTitle() );
 		return true;
 	}
-	
+
+	/**
+	 * Get parameter with either the new prefix $wgMatomo or the old $wgPiwik.
+	 *
+	 * @param string $name Parameter name without any prefix.
+	 * @return mixed|null Parameter value.
+	 */
+	public static function getParameter( $name ) {
+		$config = \MediaWiki\MediaWikiServices::getInstance()->getMainConfig();
+		if ( $config->has( "Mamoto$name" ) ) {
+			return $config->get( "Mamoto$name" );
+		} elseif ( $config->has( "Piwik$name" ) ) {
+			return $config->get( "Piwik$name" );
+		}
+		return null;
+	}
+
 	/**
 	 * Hook to save some data in Special:Search.
 	 *
@@ -58,65 +74,63 @@ class PiwikHooks {
 	}
 
 	/**
-	 * Add piwik script
+	 * Add Matomo script
 	 * @param string $title
 	 * @return string
 	 */
-	public static function AddPiwik ($title) {
-		
-		global $wgPiwikIDSite, $wgPiwikURL, $wgPiwikIgnoreSysops, 
-			   $wgPiwikIgnoreBots, $wgUser, $wgScriptPath, 
-			   $wgPiwikCustomJS, $wgPiwikActionName, $wgPiwikUsePageTitle,
-			   $wgPiwikDisableCookies, $wgPiwikProtocol,
-			   $wgPiwikTrackUsernames, $wgPiwikJSFileURL;
-		
-		// Is piwik disabled for bots?
-		if ( $wgUser->isAllowed( 'bot' ) && $wgPiwikIgnoreBots ) {
-			return "<!-- Piwik extension is disabled for bots -->";
+	public static function addMatomo ($title) {
+
+		global $wgUser, $wgScriptPath;
+
+		// Is Matomo disabled for bots?
+		if ( $wgUser->isAllowed( 'bot' ) && self::getParameter( 'IgnoreBots' ) ) {
+			return '<!-- Matomo extension is disabled for bots -->';
 		}
-		
+
 		// Ignore Wiki System Operators
-		if ( $wgUser->isAllowed( 'protect' ) && $wgPiwikIgnoreSysops ) {
-			return "<!-- Piwik tracking is disabled for users with 'protect' rights (i.e., sysops) -->";
+		if ( $wgUser->isAllowed( 'protect' ) && self::getParameter( 'IgnoreSysops' ) ) {
+			return '<!-- Matomo tracking is disabled for users with \'protect\' rights (i.e., sysops) -->';
 		}
-		
+
+		$idSite = self::getParameter( 'IDSite' );
+		$matomoURL = self::getParameter( 'URL' );
+		$protocol = self::getParameter( 'Protocol' );
+		$customJS = self::getParameter( 'CustomJS' );
+		$jsFileURL = self::getParameter( 'JSFileURL' );
+
 		// Missing configuration parameters 
-		if ( empty( $wgPiwikIDSite ) || empty( $wgPiwikURL ) ) {
-			return "<!-- You need to set the settings for Piwik -->";
+		if ( empty( $idSite ) || empty( $matomoURL ) ) {
+			return '<!-- You need to set the settings for Matomo -->';
 		}
-		
-		if ( $wgPiwikUsePageTitle ) {
-			$wgPiwikPageTitle = $title->getPrefixedText();
-		
-			$wgPiwikFinalActionName = $wgPiwikActionName;
-			$wgPiwikFinalActionName .= $wgPiwikPageTitle;
-		} else {
-			$wgPiwikFinalActionName = $wgPiwikActionName;
+
+		$finalActionName = self::getParameter( 'ActionName' );
+		if ( self::getParameter( 'UsePageTitle' ) ) {
+			$finalActionName .= $title->getPrefixedText();
 		}
-		
+
 		// Check if disablecookies flag
-		if ($wgPiwikDisableCookies) {
+		if ( self::getParameter( 'DisableCookies' ) ) {
 			$disableCookiesStr = PHP_EOL . '  _paq.push(["disableCookies"]);';
 		} else $disableCookiesStr = null;
-		
+
 		// Check if we have custom JS
-		if (!empty($wgPiwikCustomJS)) {
-			
+		if (!empty($customJS)) {
+
 			// Check if array is given
 			// If yes we have multiple lines/variables to declare
-			if (is_array($wgPiwikCustomJS)) {
-				
+			if (is_array($customJS)) {
+
 				// Make empty string with a new line
 				$customJs = PHP_EOL;
-				
+
 				// Store the lines in the $customJs line
-				foreach ($wgPiwikCustomJS as $customJsLine) { 
+				foreach ($customJS as $customJsLine) { 
 					$customJs .= $customJsLine;
 				}
-			
+
 			// CustomJs is string
-			} else $customJs = PHP_EOL . $wgPiwikCustomJS;
-			
+			} else $customJs = PHP_EOL . $customJS;
+
 		// Contents are empty
 		} else $customJs = null;
 
@@ -143,63 +157,63 @@ class PiwikHooks {
 		$urlTrackingSearch = '&' . wfArrayToCgi( $urlTrackingSearch );
 	}
 
-        // Track username based on https://piwik.org/docs/user-id/ The user
-        // name for anonymous visitors is their IP address which Piwik already
+        // Track username based on https://matomo.org/docs/user-id/ The user
+        // name for anonymous visitors is their IP address which Matomo already
         // records.
-        if ($wgPiwikTrackUsernames && $wgUser->isLoggedIn()) {
+        if ( self::getParameter( 'TrackUsernames' ) && $wgUser->isLoggedIn()) {
             $username = Xml::encodeJsVar( $wgUser->getName() );
             $customJs .= PHP_EOL . "  _paq.push([\"setUserId\",{$username}]);";
         }
 
 		// Check if server uses https
-		if ($wgPiwikProtocol == 'auto') {
+		if ( $protocol == 'auto' ) {
 			
 			if (isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] == 'on' || $_SERVER['HTTPS'] == 1) || isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https') {
-				$wgPiwikProtocol = 'https';
+				$protocol = 'https';
 			} else {
-				$wgPiwikProtocol = 'http';
+				$protocol = 'http';
 			}
 			
 		}
 		
 		// Prevent XSS
-		$wgPiwikFinalActionName = Xml::encodeJsVar( $wgPiwikFinalActionName );
+		$finalActionName = Xml::encodeJsVar( $finalActionName );
 		
-		// If $wgPiwikJSFileURL is null the locations are $wgPiwikURL/piwik.php and $wgPiwikURL/piwik.js
-		// Else they are $wgPiwikURL/piwik.php and $wgPiwikJSFileURL
-		$jsPiwikURL = '';
-		$jsPiwikURLCommon = '';
-		if( is_null( $wgPiwikJSFileURL ) ) {
-			$wgPiwikJSFileURL = 'piwik.js';
-			$jsPiwikURLCommon = '+' . Xml::encodeJsVar( $wgPiwikURL . '/' );
+		// If $wgMatomoJSFileURL is null the locations are $wgMatomoURL/piwik.php and $wgMatomoURL/piwik.js
+		// Else they are $wgMatomoURL/piwik.php and $wgMatomoJSFileURL
+		$jsMatomoURL = '';
+		$jsMatomoURLCommon = '';
+		if( is_null( $jsFileURL ) ) {
+			$jsFileURL = 'piwik.js';
+			$jsMatomoURLCommon = '+' . Xml::encodeJsVar( $matomoURL . '/' );
 		} else {
-			$jsPiwikURL = '+' . Xml::encodeJsVar( $wgPiwikURL . '/' );
+			$jsMatomoURL = '+' . Xml::encodeJsVar( $matomoURL . '/' );
 		}
-		$jsPiwikJSFileURL = Xml::encodeJsVar( $wgPiwikJSFileURL );
+		$jsMatomoJSFileURL = Xml::encodeJsVar( $jsFileURL );
 
-		// Piwik script
-		$script = <<<PIWIK
-<!-- Piwik -->
+		// Matomo script
+		$script = <<<MATOMO
+<!-- Matomo -->
 <script type="text/javascript">
   var _paq = _paq || [];{$disableCookiesStr}{$customJs}
   _paq.push(["{$trackingType}"{$jsTrackingSearch}]);
   _paq.push(["enableLinkTracking"]);
 
   (function() {
-    var u = (("https:" == document.location.protocol) ? "https" : "http") + "://"{$jsPiwikURLCommon};
-    _paq.push(["setTrackerUrl", u{$jsPiwikURL}+"piwik.php"]);
-    _paq.push(["setSiteId", "{$wgPiwikIDSite}"]);
+    var u = (("https:" == document.location.protocol) ? "https" : "http") + "://"{$jsMatomoURLCommon};
+    _paq.push(["setTrackerUrl", u{$jsMatomoURL}+"piwik.php"]);
+    _paq.push(["setSiteId", "{$idSite}"]);
     var d=document, g=d.createElement("script"), s=d.getElementsByTagName("script")[0]; g.type="text/javascript";
-    g.defer=true; g.async=true; g.src=u+{$jsPiwikJSFileURL}; s.parentNode.insertBefore(g,s);
+    g.defer=true; g.async=true; g.src=u+{$jsMatomoJSFileURL}; s.parentNode.insertBefore(g,s);
   })();
 </script>
-<!-- End Piwik Code -->
+<!-- End Matomo Code -->
 
-<!-- Piwik Image Tracker -->
-<noscript><img src="{$wgPiwikProtocol}://{$wgPiwikURL}/piwik.php?idsite={$wgPiwikIDSite}&rec=1{$urlTrackingSearch}" style="border:0" alt="" /></noscript>
-<!-- End Piwik -->
-PIWIK;
-		
+<!-- Matomo Image Tracker -->
+<noscript><img src="{$protocol}://{$matomoURL}/piwik.php?idsite={$idSite}&rec=1{$urlTrackingSearch}" style="border:0" alt="" /></noscript>
+<!-- End Matomo -->
+MATOMO;
+
 		return $script;
 		
 	}

@@ -1,45 +1,46 @@
 {
-	"name": "Piwik Integration",
-	"version": "3.1.0",
+	"name": "Matomo",
+	"version": "4.0.0",
 	"author": [
 		"Isb1009",
 		"[http://www.daschmedia.de DaSch]",
+		"[https://www.mediawiki.org/wiki/User:Seb35 Seb35]",
 		"[https://github.com/YOUR1 Youri van den Bogert]"
 	],
-	"url": "https://www.mediawiki.org/wiki/Extension:Piwik_Integration",
-	"description": "Adding Piwik Tracking Code",
+	"url": "https://www.mediawiki.org/wiki/Extension:Matomo",
+	"description": "Adding Matomo Tracking Code",
 	"license-name": "GPL-2.0-or-later",
 	"type": "other",
 	"requires": {
 		"MediaWiki": ">= 1.25.0"
 	},
 	"config": {
-		"PiwikIDSite": "",
-		"PiwikURL": "",
-		"PiwikIgnoreSysops": true,
-		"PiwikIgnoreBots": true,
-		"PiwikCustomJS": "",
-		"PiwikUsePageTitle": false,
-		"PiwikActionName": "",
-		"PiwikDisableCookies": false,
-		"PiwikProtocol": "auto",
-		"PiwikUsernameCustomVariable": [],
-		"PiwikTrackUsernames": false,
-		"PiwikJSFileURL": null
+		"MatomoIDSite": "",
+		"MatomoURL": "",
+		"MatomoIgnoreSysops": true,
+		"MatomoIgnoreBots": true,
+		"MatomoCustomJS": "",
+		"MatomoUsePageTitle": false,
+		"MatomoActionName": "",
+		"MatomoDisableCookies": false,
+		"MatomoProtocol": "auto",
+		"MatomoUsernameCustomVariable": [],
+		"MatomoTrackUsernames": false,
+		"MatomoJSFileURL": null
 	},
 	"Hooks": {
 		"SkinAfterBottomScripts": [
-			"PiwikHooks::PiwikSetup"
+			"MatomoHooks::MatomoSetup"
 		],
 		"SpecialSearchResults": [
-			"PiwikHooks::onSpecialSearchResults"
+			"MatomoHooks::onSpecialSearchResults"
 		],
 		"SpecialSearchSetupEngine": [
-			"PiwikHooks::onSpecialSearchSetupEngine"
+			"MatomoHooks::onSpecialSearchSetupEngine"
 		]
 	},
 	"AutoloadClasses": {
-		"PiwikHooks": "Piwik.hooks.php"
+		"MatomoHooks": "Matomo.hooks.php"
 	},
 	"manifest_version": 1
 }
