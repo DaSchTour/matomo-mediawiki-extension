@@ -47,7 +47,11 @@ but **ALL** steps are necessary:
 Custom variables
 ------------------------
 * Disable cookies by setting  the ```$wgMatomoDisableCookies``` variable to ```false```.
-  > For example: $wgMatomoDsiableCookies = false;
+  > For example: $wgMatomoDisableCookies = false;
+
+* Ignore regular editors: set ```$wgMatomoIgnoreEditors``` to  ```true```
+* Ignore Bots: set ```$wgMatomoIgnoreBots``` to ```true```
+* Ignore sysop users: set ```$wgMatomoIgnoreSysops``` to ```true```
 
 * To define custom javascript tags in the Matomo javascript code, its possible to define the $wgMatomoCustomJS variable. For example if you have a single setting to insert; use the following code:
    > ```$wgMatomoCustomJS = "_paq.push(['trackGoal', '1']);"```

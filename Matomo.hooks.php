@@ -92,6 +92,11 @@ class MatomoHooks {
 			return '<!-- Matomo tracking is disabled for users with \'protect\' rights (i.e., sysops) -->';
 		}
 
+		// Ignore Wiki Editors
+		if ( $wgUser->isAllowed( 'edit' ) && self::getParameter( 'IgnoreEditors' ) ) {
+			return "<!-- Matomo tracking is disabled for users with 'edit' rights -->";
+		}
+
 		$idSite = self::getParameter( 'IDSite' );
 		$matomoURL = self::getParameter( 'URL' );
 		$protocol = self::getParameter( 'Protocol' );
