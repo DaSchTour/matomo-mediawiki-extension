@@ -32,10 +32,10 @@ class MatomoHooks {
 	 */
 	public static function getParameter( $name ) {
 		$config = \MediaWiki\MediaWikiServices::getInstance()->getMainConfig();
-		if ( $config->has( "Mamoto$name" ) ) {
-			return $config->get( "Mamoto$name" );
-		} elseif ( $config->has( "Piwik$name" ) ) {
+		if ( $config->has( "Piwik$name" ) ) {
 			return $config->get( "Piwik$name" );
+		} elseif ( $config->has( "Matomo$name" ) ) {
+			return $config->get( "Matomo$name" );
 		}
 		return null;
 	}

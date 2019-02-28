@@ -1,7 +1,7 @@
 Mamoto extension for MediaWiki
 ==============================
-Version 4.0.0
- - Last update: 15 February 2019
+Version 4.0.1
+ - Last update: 28 February 2019
 
 This the Mamoto (ex-Piwik) integration extension for MediaWiki
 software. The extension is only useful if you've got a MediaWiki
