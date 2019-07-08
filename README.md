@@ -26,7 +26,7 @@ but **ALL** steps are necessary:
 3. Edit your LocalSettings.php and, at the end of the file, add the
   following:
 
-        ```wfLoadExtension( 'Matomo' );```
+        wfLoadExtension( 'Matomo' );
 
 
 4. Configure the Matomo URL and site-id. To do so; edit the LocalSettings and set up the following variables:
@@ -57,7 +57,7 @@ Custom variables
    > ```$wgMatomoCustomJS = "_paq.push(['trackGoal', '1']);"```
 
    If you have multiple variables to define; use an array. For example:
->`` $wgMatomoCustomJS = array(
+   > `` $wgMatomoCustomJS = array(
 "_paq.push(['setCustomVariable', '1','environment','production']);",
 "_paq.push(['setCustomVariable', '1','is_user','yes']);"
 );``
