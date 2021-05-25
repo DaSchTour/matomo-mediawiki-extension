@@ -1,46 +1,60 @@
 {
 	"name": "Matomo",
-	"version": "4.0.1",
+	"version": "4.2.4",
 	"author": [
 		"Isb1009",
 		"[http://www.daschmedia.de DaSch]",
 		"[https://www.mediawiki.org/wiki/User:Seb35 Seb35]",
-		"[https://github.com/YOUR1 Youri van den Bogert]"
+		"[https://github.com/YOUR1 Youri van den Bogert]",
+		"[https://www.gruniversal.de David Gruner]"
 	],
 	"url": "https://www.mediawiki.org/wiki/Extension:Matomo",
-	"description": "Adding Matomo Tracking Code",
+	"descriptionmsg": "matomo-desc",
 	"license-name": "GPL-2.0-or-later",
 	"type": "other",
 	"requires": {
 		"MediaWiki": ">= 1.25.0"
 	},
+	"MessagesDirs": {
+		"Matomo": [
+			"i18n"
+		]
+	},
 	"config": {
 		"MatomoIDSite": "",
 		"MatomoURL": "",
+		"MatomoDisableCookies": false,
 		"MatomoIgnoreSysops": true,
 		"MatomoIgnoreBots": true,
-		"MatomoCustomJS": "",
-		"MatomoUsePageTitle": false,
-		"MatomoActionName": "",
-		"MatomoDisableCookies": false,
-		"MatomoProtocol": "auto",
-		"MatomoUsernameCustomVariable": [],
+		"MatomoIgnoreEditors": false,
 		"MatomoTrackUsernames": false,
+		"MatomoCustomJS": "",
+		"MatomoProtocol": "auto",
 		"MatomoJSFileURL": null
 	},
 	"Hooks": {
-		"SkinAfterBottomScripts": [
-			"MatomoHooks::MatomoSetup"
-		],
-		"SpecialSearchResults": [
-			"MatomoHooks::onSpecialSearchResults"
-		],
-		"SpecialSearchSetupEngine": [
-			"MatomoHooks::onSpecialSearchSetupEngine"
-		]
+		"SkinAfterBottomScripts": "MatomoHooks::onSkinAfterBottomScripts",
+		"SpecialSearchResults": "MatomoHooks::onSpecialSearchResults",
+		"SpecialSearchSetupEngine": "MatomoHooks::onSpecialSearchSetupEngine",
+		"ParserFirstCallInit": "MatomoHooks::onParserFirstCallInit",
+		"BeforePageDisplay": "MatomoHooks::onBeforePageDisplay"
 	},
 	"AutoloadClasses": {
-		"MatomoHooks": "Matomo.hooks.php"
+		"MatomoHooks": "MatomoHooks.php"
+	},
+	"ExtensionMessagesFiles": {
+		"MatomoMagic": "Matomo.i18n.magic.php"
+	},
+	"ResourceFileModulePaths": {
+		"localBasePath": "",
+		"remoteExtPath": "Matomo"
+	},
+	"ResourceModules": {
+	    "ext.MatomoOptOut": {
+	        "scripts": [
+	        	"MatomoOptOut.js"
+	    	]
+	    }
 	},
 	"manifest_version": 1
 }
