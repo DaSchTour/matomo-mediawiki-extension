@@ -2,13 +2,11 @@ Matomo extension for MediaWiki
 ==============================
 
 * Version 4.2.4
-* Last update: 13th April 2021
+* Last update: 26th May 2021
 
-This extension is a modified version of the regular [Matomo extension](https://www.mediawiki.org/wiki/Extension:Matomo).
+This the Mamoto (ex-Piwik) integration extension for MediaWiki software. The extension is only useful if you've got a MediaWiki installation; it can only be installed by the administrator of the site.
 
-It has been developed based on version 4.0.1 from the original source code:
-https://github.com/DaSchTour/matomo-mediawiki-extension/
-
+Versions 4.0.1 to 4.2.4 of this extension were created by David Gruner on https://gitlab.com/gruniversal/erwin/-/commits/master/src/extensions/Matomo
 
 Minimum requirements
 --------------------------------
