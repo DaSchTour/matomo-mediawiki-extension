@@ -45,7 +45,7 @@ The installation is fairly easy, just follow these steps:
 
     Fill in your URL and site ID your got from step 1.
 
-    Note: Until version 4.2.0 $wgMatomoURL had to be defined without protocol and filename (e.g. "matomo-host.tld/dir/"). This configuration will still work but is deprecated.
+    Note: Until version 4.2.0 `$wgMatomoURL` had to be defined without protocol and filename (e.g. `"matomo-host.tld/dir/"`). This configuration will still work but is deprecated.
 
 3. Check if the Matomo Extension is loaded in MediaWiki. It should be listed on the page "Special:Version".
 
