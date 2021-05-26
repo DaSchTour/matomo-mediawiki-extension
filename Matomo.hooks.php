@@ -5,7 +5,7 @@ class MatomoHooks {
 	/** @var string|null Searched term in Special:Search. */
 	public static $searchTerm = null;
 
-	/** @var string|null Search profile in Special:Search (search category in Piwik vocabulary). */
+	/** @var string|null Search profile in Special:Search (search category in Matomo vocabulary). */
 	public static $searchProfile = null;
 
 	/** @var int|null Number of results in Special:Search. */
@@ -172,6 +172,8 @@ OPTOUT;
 			return '<!-- You need to set the settings for Matomo -->';
 		}
 
+		// TODO: remove, as parameters are not used any more
+		// see: https://github.com/DaSchTour/matomo-mediawiki-extension/issues/22
 		$finalActionName = self::getParameter( 'ActionName' );
 		if ( self::getParameter( 'UsePageTitle' ) ) {
 			$finalActionName .= $title->getPrefixedText();
@@ -183,11 +185,11 @@ OPTOUT;
 		} else $disableCookiesStr = null;
 
 		// Check if we have custom JS
-		if ( !empty($customJS) ) {
+		if ( !empty( $customJS ) ) {
 
 			// Check if array is given
 			// If yes we have multiple lines/variables to declare
-			if ( is_array($customJS) ) {
+			if ( is_array( $customJS ) ) {
 
 				// Make empty string with a new line
 				$customJs = PHP_EOL;
@@ -203,29 +205,29 @@ OPTOUT;
 		// Contents are empty
 		} else $customJs = null;
 
-	// Track search results
-	$trackingType = 'trackPageView';
-	$jsTrackingSearch = '';
-	$urlTrackingSearch = '';
-	if ( !is_null( self::$searchTerm ) ) {
+		// Track search results
+		$trackingType = 'trackPageView';
+		$jsTrackingSearch = '';
+		$urlTrackingSearch = '';
+		if ( !is_null( self::$searchTerm ) ) {
 
-		// JavaScript
-		$trackingType = 'trackSiteSearch';
-		$jsTerm = Xml::encodeJsVar( self::$searchTerm );
-		$jsCategory = is_null( self::$searchProfile ) ? 'false' : Xml::encodeJsVar( self::$searchProfile );
-		$jsResultsCount = is_null( self::$searchCount ) ? 'false' : self::$searchCount;
-		$jsTrackingSearch = ",$jsTerm,$jsCategory,$jsResultsCount";
+			// JavaScript
+			$trackingType = 'trackSiteSearch';
+			$jsTerm = Xml::encodeJsVar( self::$searchTerm );
+			$jsCategory = is_null( self::$searchProfile ) ? 'false' : Xml::encodeJsVar( self::$searchProfile );
+			$jsResultsCount = is_null( self::$searchCount ) ? 'false' : self::$searchCount;
+			$jsTrackingSearch = ",$jsTerm,$jsCategory,$jsResultsCount";
 
-		// URL
-		$urlTrackingSearch = [ 'search' => self::$searchTerm ];
-		if( !is_null( self::$searchProfile ) ) {
-			$urlTrackingSearch += [ 'search_cat' => self::$searchProfile ];
+			// URL
+			$urlTrackingSearch = [ 'search' => self::$searchTerm ];
+			if( !is_null( self::$searchProfile ) ) {
+				$urlTrackingSearch += [ 'search_cat' => self::$searchProfile ];
+			}
+			if( !is_null( self::$searchCount ) ) {
+				$urlTrackingSearch += [ 'search_count' => self::$searchCount ];
+			}
+			$urlTrackingSearch = '&' . wfArrayToCgi( $urlTrackingSearch );
 		}
-		if( !is_null( self::$searchCount ) ) {
-			$urlTrackingSearch += [ 'search_count' => self::$searchCount ];
-		}
-		$urlTrackingSearch = '&' . wfArrayToCgi( $urlTrackingSearch );
-	}
 
         // Track username based on https://matomo.org/docs/user-id/ The user
         // name for anonymous visitors is their IP address which Matomo already
@@ -235,6 +237,9 @@ OPTOUT;
             $customJs .= PHP_EOL . "  _paq.push(['setUserId',{$username}]);";
         }
 
+        // TODO: check, it assumes that Matomo runs on the same server
+        // TODO: check, also it would be easier to use $wgMatomoURL with given protocol
+        // see: https://github.com/DaSchTour/matomo-mediawiki-extension/issues/28
 		// Check if server uses https
 		if ( $protocol == 'auto' ) {
 
