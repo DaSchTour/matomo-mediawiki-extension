@@ -43,14 +43,16 @@ document.addEventListener("DOMContentLoaded", function(event) {
   }
 
   var optOut = document.getElementById("matomo-optout");
-  optOut.addEventListener("click", function() {
-    if (this.checked) {
-      _paq.push(['forgetUserOptOut']);
-    } else {
-      _paq.push(['optUserOut']);
-    }
+  if ( optOut !== null ) {
+    optOut.addEventListener("click", function() {
+      if (this.checked) {
+        _paq.push(['forgetUserOptOut']);
+      } else {
+        _paq.push(['optUserOut']);
+      }
+      setOptOutText(optOut);
+    });
     setOptOutText(optOut);
-  });
-  setOptOutText(optOut);
+  }
 });
 
