@@ -65,6 +65,8 @@ class MatomoHooks {
 	 * Add an array or a single callback to the list of additional Matomo callbacks
 	 *
 	 * @param      mixed  $callbacks  Matomo callback(s) (type: string|array)
+	 *
+	 * @return     true
 	 */
 	private static function addMatomoCallbacks( $callbacks = null ) {
 
@@ -79,7 +81,7 @@ class MatomoHooks {
 		// add single callback
 		self::$MatomoCallbacks[] = '  ' . trim( $callbacks );
 
-		return;
+		return true;
 	}
 
 	/**
@@ -179,19 +181,21 @@ class MatomoHooks {
 
 		$out->addScriptFile( '/extensions/Matomo/MatomoOptOut.js' );
 
-		return;
+		return true;
 	}
 
 	/**
 	 * Hook: Register parser tag for Matomo opt out
 	 *
 	 * @param      Parser  $parser
+	 *
+	 * @return     true
 	 */
 	public static function onParserFirstCallInit( Parser $parser ) {
 
 		$parser->setHook( 'matomo-optout', [ self::class, 'parserTagMatomoOptOut'] );
 
-		return;
+		return true;
 	}
 
 	/**
@@ -310,10 +314,10 @@ OPTOUT;
 
 			// URL
 			$urlTrackingSearch = [ 'search' => self::$searchTerm ];
-			if( !is_null( self::$searchProfile ) ) {
+			if ( !is_null( self::$searchProfile ) ) {
 				$urlTrackingSearch += [ 'search_cat' => self::$searchProfile ];
 			}
-			if( !is_null( self::$searchCount ) ) {
+			if ( !is_null( self::$searchCount ) ) {
 				$urlTrackingSearch += [ 'search_count' => self::$searchCount ];
 			}
 			$urlTrackingSearch = '&' . wfArrayToCgi( $urlTrackingSearch );
