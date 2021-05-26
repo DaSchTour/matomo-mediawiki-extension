@@ -18,12 +18,13 @@
 	"config": {
 		"MatomoIDSite": "",
 		"MatomoURL": "",
+		"MatomoDisableCookies": false,
 		"MatomoIgnoreSysops": true,
 		"MatomoIgnoreBots": true,
-		"MatomoCustomJS": "",
-		"MatomoDisableCookies": false,
-		"MatomoProtocol": "auto",
+		"MatomoIgnoreEditors": false,
 		"MatomoTrackUsernames": false,
+		"MatomoCustomJS": "",
+		"MatomoProtocol": "auto",
 		"MatomoJSFileURL": null
 	},
 	"Hooks": {

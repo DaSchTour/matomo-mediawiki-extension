@@ -1,46 +1,53 @@
-Mamoto extension for MediaWiki
+Matomo extension for MediaWiki
 ==============================
 
-Version 4.2.0
- - Last update: 24 January 2021
+* Version 4.2.0
+* Last update: 24th January 2021
 
-This the Matomo (ex-Piwik) integration extension for MediaWiki software.
-The extension is only useful if you've got a MediaWiki installation;
-it can only be installed by the administrator of the site.
+This extension is a modified version of the regular [Matomo extension](https://www.mediawiki.org/wiki/Extension:Matomo).
+
+It has been developed based on version 4.0.1 from the original source code:
+https://github.com/DaSchTour/matomo-mediawiki-extension/
 
 
 Minimum requirements
 --------------------------------
 
-1.  MediaWiki 1.25+
+This extension integrates Matomo (formerly known as Piwik) into your MediaWiki application.
 
-2.  A Matomo (0.4+) installation with the site configured
+It does not contain Matomo, so you have to install and setup it separately first.
 
+The extension requires at least the following versions to fully work:
+
+* MediaWiki 1.25+
+* Matomo 2.7+
 
 Installation instructions
 ---------------------------------
 
-Please, read them carefully. They're not very difficult to understand, but **ALL** steps are necessary:
+The installation is fairly easy, just follow these steps:
 
-1. Create a folder called "Matomo" in your extensions directory
+1. If you haven't set up a site for your MediaWiki yet, follow this guide to add a new site to Matomo: https://matomo.org/docs/manage-websites/
 
-2. Upload extension.json and Matomo.hooks.php in the "Matomo" folder you've just created
+    Be sure to note URL and site ID since you will need it in a minute.
 
-3. Edit your LocalSettings.php and, at the end of the file, add the following:
+2. Copy the whole "Matomo" folder into your extensions directory
 
-  ```wfLoadExtension( 'Matomo' );```
+    Note: You can also use `composer.json` to add the extension to your site.
 
-4. Configure the Matomo URL and site-id. To do so; edit the LocalSettings and set up the following variables:
+3. Edit your `LocalSettings.php` and add the following at the end of the file:
 
-  ```$wgMatomoURL = "https://your-matomo-server.tld/matomo/matomo.php";```
-  
-  ```$wgMatomoIDSite = 1;```
+    ```php
+    wfLoadExtension( 'Matomo' );
+    $wgMatomoURL = "https://your-matomo-server.tld/matomo/matomo.php";
+    $wgMatomoIDSite = 1;
+    ```
 
-  Note: Until version 4.2.0 $wgMatomoURL had to be defined without protocol and filename (e.g. "matomo-host.tld/dir/"). This configuration will still work but is deprecated.
+    Fill in your URL and site ID your got from step 1.
 
-5. Enjoy our extension!
+    Note: Until version 4.2.0 $wgMatomoURL had to be defined without protocol and filename (e.g. "matomo-host.tld/dir/"). This configuration will still work but is deprecated.
 
-  Note: to check if the extension has successfully installed; go to your wiki and check if the Matomo extension is present on the bottom of the Wiki source code.
+3. Check if the Matomo Extension is loaded in MediaWiki. It should be listed on the page "Special:Version".
 
 
 Matomo opt out
@@ -50,7 +57,9 @@ This extension offers a simple way to include an opt out mechanism into your pag
 
 You only need to add this parser tag to your page (e.g. data protection):
 
-  ```<matomo-optout />```
+  ```html
+  <matomo-optout />
+  ```
 
 User can then toggle their consent status by clicking on the corresponding text.
 
@@ -61,23 +70,47 @@ This can replace the none-responsive iframe opt-out and is inspired by this arti
 Custom variables
 ------------------------
 
-* Disable cookies by setting  the ```$wgMatomoDisableCookies``` variable to ```false```.
-  > For example: $wgMatomoDisableCookies = false;
+* Disable cookies permanent cookies (default: `false`)
 
-* Ignore regular editors: set ```$wgMatomoIgnoreEditors``` to  ```true``` (default: ```false```)
-* Ignore Bots: set ```$wgMatomoIgnoreBots``` to ```true``` (default: ```true```)
-* Ignore sysop users: set ```$wgMatomoIgnoreSysops``` to ```true``` (default: ```true```)
+    ```php
+    $wgMatomoDisableCookies = true;
+    ```
 
-* To define custom javascript tags in the Matomo javascript code, its possible to define the $wgMatomoCustomJS variable. For example if you have a single setting to insert; use the following code:
+* Do not track regular editors (default: `false`)
 
-  ```$wgMatomoCustomJS = "_paq.push(['trackGoal', '1']);"```
+    ```php
+    $wgMatomoIgnoreEditors = true;
+    ```
 
-  If you have multiple variables to define; use an array. For example:
+* Do not track bots (default: `true`)
 
-  `` $wgMatomoCustomJS = array(
-  "_paq.push(['setCustomVariable', '1','environment','production']);",
-  "_paq.push(['setCustomVariable', '1','is_user','yes']);"
-  );``
+    ```php
+    $wgMatomoIgnoreEditors = true;
+    ```
 
-* If you want to track the username of the visitor with the Matomo feature User ID (needs Matomo >= 2.7.0) 
-  set the ```$wgMatomoTrackUsernames``` to true in LocalSettings.php.
+* Do not track sysop users (default: `true`)
+
+    ```php
+    $wgMatomoIgnoreSysops = true;
+    ```
+
+* Track users by their MediaWiki username:  (default: `false`)
+
+    ```php
+    $wgMatomoTrackUsernames = true;
+    ```
+
+* You may also add custom javascript callbacks to the inserted Matomo code:
+
+    ```php
+    $wgMatomoCustomJS = "_paq.push(['trackGoal', '1']);"
+    ```
+
+  If you have multiple variables to define, use an array:
+
+    ```php
+    $wgMatomoCustomJS = array (
+      "_paq.push(['setCustomVariable', '1', 'environment', 'production']);",
+      "_paq.push(['setCustomVariable', '1', 'is_user', 'yes']);"
+    );
+    ```
