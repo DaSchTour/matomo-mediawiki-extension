@@ -1,0 +1,9 @@
+{
+	"@metadata": {
+		"authors": [
+			"David Gruner"
+		]
+	},
+	"matomo-desc": "Fügt den Matomo Tracking Code auf jeder Seite ein.",
+	"matomo-disabled": "Die Matomo Webanalyse ist in den Einstellungen für deinen Benutzeraccount deaktiviert."
+}

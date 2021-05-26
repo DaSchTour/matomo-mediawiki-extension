@@ -1,73 +1,114 @@
-Mamoto extension for MediaWiki
+Matomo extension for MediaWiki
 ==============================
-Version 4.0.1
- - Last update: 28 February 2019
 
-This the Mamoto (ex-Piwik) integration extension for MediaWiki
-software. The extension is only useful if you've got a MediaWiki
-installation; it can only be installed by the administrator of the site.
+* Version 4.2.4
+* Last update: 26th May 2021
+
+This the Mamoto (ex-Piwik) integration extension for MediaWiki software. The extension is only useful if you've got a MediaWiki installation; it can only be installed by the administrator of the site.
+
+Versions 4.0.1 to 4.2.4 of this extension were created by David Gruner on https://gitlab.com/gruniversal/erwin/-/commits/master/src/extensions/Matomo
 
 Minimum requirements
 --------------------------------
 
-1.  MediaWiki 1.25+
+This extension integrates Matomo (formerly known as Piwik) into your MediaWiki application.
 
-2.  A Matomo (0.4+) installation with the site configured
+It does not contain Matomo, so you have to install and setup it separately first.
+
+The extension requires at least the following versions to fully work:
+
+* MediaWiki 1.25+
+* Matomo 2.7+
 
 Installation instructions
 ---------------------------------
-Please, read them carefully. They're not very difficult to understand,
-but **ALL** steps are necessary:
 
-1. Create a folder called "Matomo" in your extensions directory
+The installation is fairly easy, just follow these steps:
 
-2. Upload extension.json and Matomo.hooks.php in the "Matomo" folder you've just created
+1. If you haven't set up a site for your MediaWiki yet, follow this guide to add a new site to Matomo: https://matomo.org/docs/manage-websites/
 
-3. Edit your LocalSettings.php and, at the end of the file, add the
-  following:
+    Be sure to note URL and site ID since you will need it in a minute.
 
-        wfLoadExtension( 'Matomo' );
+2. Copy the whole "Matomo" folder into your extensions directory
+
+    Note: You can also use `composer.json` to add the extension to your site.
+
+3. Edit your `LocalSettings.php` and add the following at the end of the file:
+
+    ```php
+    wfLoadExtension( 'Matomo' );
+    $wgMatomoURL = "https://your-matomo-server.tld/matomo/matomo.php";
+    $wgMatomoIDSite = 1;
+    ```
+
+    Fill in your URL and site ID your got from step 1.
+
+    Note: Until version 4.2.0 `$wgMatomoURL` had to be defined without protocol and filename (e.g. `"matomo-host.tld/dir/"`). This configuration will still work but is deprecated.
+
+3. Check if the Matomo Extension is loaded in MediaWiki. It should be listed on the page "Special:Version".
 
 
-4. Configure the Matomo URL and site-id. To do so; edit the LocalSettings and set up the following variables:
-      > $wgMatomoURL = "matomo-host.tld/dir/";
+Matomo opt out
+------------------------
 
-      > $wgMatomoIDSite = "matomo_idsite";
+This extension offers a simple way to include an opt out mechanism into your pages.
 
-      **IMPORTANT** Do not define the protocol of the $wgMatomoURL
+You only need to add this parser tag to your page (e.g. data protection):
 
-  Note: Change the value of $wgMatomoURL with the URL, without the protocol
-	but including the domain name, where you installed Matomo.
-	Remember to add the trailing slash!
+  ```html
+  <matomo-optout />
+  ```
 
-5. Enjoy our extension!
-> Note: to check if the extension has succesfully installed; go to your wiki and check if the Matomo extension is present on the bottom of the Wiki source code.
+User can then toggle their consent status by clicking on the corresponding text.
+
+This can replace the none-responsive iframe opt-out and is inspired by this article:
+* https://developer.matomo.org/guides/tracking-javascript-guide#optional-creating-a-custom-opt-out-form
 
 
 Custom variables
 ------------------------
-* Disable cookies by setting  the ```$wgMatomoDisableCookies``` variable to ```false```.
-  > For example: $wgMatomoDisableCookies = false;
 
-* Ignore regular editors: set ```$wgMatomoIgnoreEditors``` to  ```true```
-* Ignore Bots: set ```$wgMatomoIgnoreBots``` to ```true```
-* Ignore sysop users: set ```$wgMatomoIgnoreSysops``` to ```true```
+* Disable cookies permanent cookies (default: `false`)
 
-* To define custom javascript tags in the Matomo javascript code, its possible to define the $wgMatomoCustomJS variable. For example if you have a single setting to insert; use the following code:
-   > ```$wgMatomoCustomJS = "_paq.push(['trackGoal', '1']);"```
+    ```php
+    $wgMatomoDisableCookies = true;
+    ```
 
-   If you have multiple variables to define; use an array. For example:
-   > `` $wgMatomoCustomJS = array(
-"_paq.push(['setCustomVariable', '1','environment','production']);",
-"_paq.push(['setCustomVariable', '1','is_user','yes']);"
-);``
+* Do not track regular editors (default: `false`)
 
-* If you want to change the title of your pages inside the Matomo tracker,
-  you can set ```$wgMatomoActionName``` inside your LocalSettings.php file.
+    ```php
+    $wgMatomoIgnoreEditors = true;
+    ```
 
-* In case you want to include the title as, for example,
-   "wiki/Title of the page", you can set ```$wgMatomoUsePageTitle``` to
-  ```true``` and set ```$wgMatomoActionName``` to ```wiki/```. The extension will print matomo_action_name = 'wiki/Title of the page';
+* Do not track bots (default: `true`)
 
-* If you want to track the username of the visitor with the Matomo feature User ID (needs Matomo >= 2.7.0) 
-  set the ```$wgMatomoTrackUsernames``` to true in LocalSettings.php.
+    ```php
+    $wgMatomoIgnoreEditors = true;
+    ```
+
+* Do not track sysop users (default: `true`)
+
+    ```php
+    $wgMatomoIgnoreSysops = true;
+    ```
+
+* Track users by their MediaWiki username:  (default: `false`)
+
+    ```php
+    $wgMatomoTrackUsernames = true;
+    ```
+
+* You may also add custom javascript callbacks to the inserted Matomo code:
+
+    ```php
+    $wgMatomoCustomJS = "_paq.push(['trackGoal', '1']);"
+    ```
+
+  If you have multiple variables to define, use an array:
+
+    ```php
+    $wgMatomoCustomJS = array (
+      "_paq.push(['setCustomVariable', '1', 'environment', 'production']);",
+      "_paq.push(['setCustomVariable', '1', 'is_user', 'yes']);"
+    );
+    ```

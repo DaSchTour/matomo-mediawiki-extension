@@ -1,0 +1,9 @@
+{
+	"@metadata": {
+		"authors": [
+			"David Gruner"
+		]
+	},
+	"matomo-desc": "Add Matomo tracking code to every page.",
+	"matomo-disabled": "matomo tracking is disabled in settings for your user account."
+}
