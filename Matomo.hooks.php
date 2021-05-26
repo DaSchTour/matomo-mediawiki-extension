@@ -19,7 +19,7 @@ class MatomoHooks {
 	 *
 	 * @return     bool
 	 */
-	public static function MatomoSetup ($skin, &$text = '')	{
+	public static function onSkinAfterBottomScripts ($skin, &$text = '')	{
 
 		$text .= self::addMatomo( $skin->getTitle() );
 

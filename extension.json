@@ -27,7 +27,7 @@
 		"MatomoJSFileURL": null
 	},
 	"Hooks": {
-		"SkinAfterBottomScripts": "MatomoHooks::MatomoSetup",
+		"SkinAfterBottomScripts": "MatomoHooks::onSkinAfterBottomScripts",
 		"SpecialSearchResults": "MatomoHooks::onSpecialSearchResults",
 		"SpecialSearchSetupEngine": "MatomoHooks::onSpecialSearchSetupEngine",
 		"ParserFirstCallInit": "MatomoHooks::onParserFirstCallInit",
