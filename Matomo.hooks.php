@@ -3,23 +3,70 @@
 class MatomoHooks {
 
 	/** @var string|null Searched term in Special:Search. */
-	public static $searchTerm = null;
+	private static $searchTerm = null;
 
 	/** @var string|null Search profile in Special:Search (search category in Matomo vocabulary). */
-	public static $searchProfile = null;
+	private static $searchProfile = null;
 
 	/** @var int|null Number of results in Special:Search. */
-	public static $searchCount = null;
+	private static $searchCount = null;
 
-	/** @var array Collection of additional matomo callbacks */
-	public static $MatomoCallbacks = [];
+	/** @var array Collection of additional Matomo callbacks */
+	private static $MatomoCallbacks = [];
 
 	/**
-	 * Add an array or a single callback to the list of additional matomo callbacks
+	 * Check if Matomo is disabled (to skip all processing)
 	 *
-	 * @param      string|array  $customJS  matomo callback(s)
+	 * @param      bool  true    if Matomo is disabled
 	 */
-	public static function addMatomoCallbacks( $callbacks = null ) {
+	private static function isMatomoDisabled() {
+
+		global $wgUser;
+
+		// Disable Matomo for Wiki Editors (if configured)
+		if ( $wgUser->isAllowed( 'edit' ) && self::getParameter( 'IgnoreEditors' ) ) {
+			return true;
+		}
+
+		// Disable Matomo for bots (if configured)
+		if ( $wgUser->isAllowed( 'bot' ) && self::getParameter( 'IgnoreBots' ) ) {
+			return true;
+		}
+
+		// Disable Matomo for Wiki System Operators (if configured)
+		if ( $wgUser->isAllowed( 'protect' ) && self::getParameter( 'IgnoreSysops' ) ) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Get parameter with either the new prefix $wgMatomo or the old $wgPiwik.
+	 *
+	 * @param      string      $name   Parameter name without any prefix.
+	 *
+	 * @return     mixed|null  Parameter value.
+	 */
+	private static function getParameter( $name ) {
+
+		$config = \MediaWiki\MediaWikiServices::getInstance()->getMainConfig();
+
+		if ( $config->has( "Piwik$name" ) ) {
+			return $config->get( "Piwik$name" );
+		} elseif ( $config->has( "Matomo$name" ) ) {
+			return $config->get( "Matomo$name" );
+		}
+
+		return null;
+	}
+
+	/**
+	 * Add an array or a single callback to the list of additional Matomo callbacks
+	 *
+	 * @param      string|array  $customJS  Matomo callback(s)
+	 */
+	private static function addMatomoCallbacks( $callbacks = null ) {
 
 		// recursion: add array of callbacks
 		if ( is_array( $callbacks ) ) {
@@ -36,17 +83,17 @@ class MatomoHooks {
 	}
 
 	/**
-	 * Get the list of additional matomo callbacks as string
+	 * Get the list of additional Matomo callbacks as string
 	 *
 	 * @return     string
 	 */
-	public static function getMatomoCallbacks() {
+	private static function getMatomoCallbacks() {
 
 		return implode( PHP_EOL, self::$MatomoCallbacks );
 	}
 
 	/**
-	 * Initialize the Matomo hook
+	 * Hook: Insert Matomo script before closing <body>
 	 *
 	 * @param      string  $skin
 	 * @param      string  $text
@@ -55,33 +102,18 @@ class MatomoHooks {
 	 */
 	public static function onSkinAfterBottomScripts($skin, &$text = '')	{
 
-		$text .= self::addMatomo( $skin->getTitle() );
+		// skip if Matomo is disabled
+		if ( self::isMatomoDisabled() ) {
+			return true;
+		}
+
+		$text .= self::addMatomoScript( $skin->getTitle() );
 
 		return true;
 	}
 
 	/**
-	 * Get parameter with either the new prefix $wgMatomo or the old $wgPiwik.
-	 *
-	 * @param      string      $name   Parameter name without any prefix.
-	 *
-	 * @return     mixed|null  Parameter value.
-	 */
-	public static function getParameter( $name ) {
-
-		$config = \MediaWiki\MediaWikiServices::getInstance()->getMainConfig();
-
-		if ( $config->has( "Piwik$name" ) ) {
-			return $config->get( "Piwik$name" );
-		} elseif ( $config->has( "Matomo$name" ) ) {
-			return $config->get( "Matomo$name" );
-		}
-
-		return null;
-	}
-
-	/**
-	 * Hook to save some data in Special:Search.
+	 * Hook: Save some additional data in Special:Search.
 	 *
 	 * @param      string                $term          Searched term.
 	 * @param      SearchResultSet|null  $titleMatches  Results in the titles.
@@ -90,6 +122,11 @@ class MatomoHooks {
 	 * @return     true
 	 */
 	public static function onSpecialSearchResults( $term, $titleMatches, $textMatches ) {
+
+		// skip if Matomo is disabled
+		if ( self::isMatomoDisabled() ) {
+			return true;
+		}
 
 		self::$searchTerm = $term;
 		self::$searchCount = 0;
@@ -105,7 +142,7 @@ class MatomoHooks {
 	}
 
 	/**
-	 * Hook to save some data in Special:Search.
+	 * Hook: Save some additional data in Special:Search.
 	 *
 	 * @param      SpecialSearch  $search   Special page.
 	 * @param      string|null    $profile  Search profile.
@@ -115,18 +152,28 @@ class MatomoHooks {
 	 */
 	public static function onSpecialSearchSetupEngine( $search, $profile, $engine ) {
 
+		// skip if Matomo is disabled
+		if ( self::isMatomoDisabled() ) {
+			return true;
+		}
+
 		self::$searchProfile = $profile;
 
 		return true;
 	}
 
 	/**
-	 * Insert javascript for matomo opt out
+	 * Hook: Insert JavaScript for Matomo opt out
 	 *
 	 * @param      OutputPage  $out
 	 * @param      Skin        $skin
 	 */
 	public static function onBeforePageDisplay( OutputPage $out, Skin $skin ) {
+
+		// skip if Matomo is disabled
+		if ( self::isMatomoDisabled() ) {
+			return true;
+		}
 
 		$out->addScriptFile( '/extensions/Matomo/MatomoOptOut.js' );
 
@@ -134,11 +181,16 @@ class MatomoHooks {
 	}
 
 	/**
-	 * Register parser tag for matomo opt out
+	 * Hook: Register parser tag for Matomo opt out
 	 *
 	 * @param      Parser  $parser
 	 */
 	public static function onParserFirstCallInit( Parser $parser ) {
+
+		// skip if Matomo is disabled
+		if ( self::isMatomoDisabled() ) {
+			return true;
+		}
 
 		$parser->setHook( 'matomo-optout', [ self::class, 'parserTagMatomoOptOut'] );
 
@@ -176,28 +228,9 @@ OPTOUT;
 	 *
 	 * @return     string
 	 */
-	public static function addMatomo( $title ) {
+	private static function addMatomoScript( $title ) {
 
 		global $wgUser, $wgScriptPath, $wgServer;
-
-
-		## Disable Matomo for some users
-
-		// Is Matomo disabled for bots?
-		if ( $wgUser->isAllowed( 'bot' ) && self::getParameter( 'IgnoreBots' ) ) {
-			return '<!-- Matomo extension is disabled for bots -->';
-		}
-
-		// Ignore Wiki System Operators
-		if ( $wgUser->isAllowed( 'protect' ) && self::getParameter( 'IgnoreSysops' ) ) {
-			return '<!-- Matomo tracking is disabled for users with \'protect\' rights (i.e., sysops) -->';
-		}
-
-		// Ignore Wiki Editors
-		if ( $wgUser->isAllowed( 'edit' ) && self::getParameter( 'IgnoreEditors' ) ) {
-			return "<!-- Matomo tracking is disabled for users with 'edit' rights -->";
-		}
-
 
 		## Configure paths and site ID
 
@@ -228,7 +261,7 @@ OPTOUT;
 		// use different JS URL if given
 		$matomoJSFileURL = self::getParameter( 'JSFileURL' ) ?: $matomoJSFileURL;
 
-		// encode paths for javascript
+		// encode paths for JavaScript
 		$jsMatomoURL = Xml::encodeJsVar( $matomoURL );
 		$jsMatomoJSFileURL = Xml::encodeJsVar( $matomoJSFileURL );
 
@@ -236,7 +269,7 @@ OPTOUT;
 		$idSite = (int) self::getParameter( 'IDSite' ) ?: 1;
 
 
-		## Javascript callbacks
+		## JavaScript callbacks
 
 		// Disable cookies for cookie-less tracking
 		if ( self::getParameter( 'DisableCookies' ) ) {
