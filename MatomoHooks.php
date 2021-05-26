@@ -234,7 +234,7 @@ OPTOUT;
 	 */
 	private static function addMatomoScript( $title ) {
 
-		global $wgUser, $wgScriptPath, $wgServer;
+		global $wgUser, $wgServer;
 
 		## Configure paths and site ID
 
