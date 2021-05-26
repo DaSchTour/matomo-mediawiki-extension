@@ -1,8 +1,8 @@
 Matomo extension for MediaWiki
 ==============================
 
-* Version 4.2.0
-* Last update: 24th January 2021
+* Version 4.2.1
+* Last update: 6th February 2021
 
 This extension is a modified version of the regular [Matomo extension](https://www.mediawiki.org/wiki/Extension:Matomo).
 
