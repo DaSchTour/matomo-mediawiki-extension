@@ -1,6 +1,6 @@
 {
 	"name": "Matomo",
-	"version": "4.2.2",
+	"version": "4.2.3",
 	"author": [
 		"Isb1009",
 		"[http://www.daschmedia.de DaSch]",
@@ -40,7 +40,7 @@
 		"BeforePageDisplay": "MatomoHooks::onBeforePageDisplay"
 	},
 	"AutoloadClasses": {
-		"MatomoHooks": "Matomo.hooks.php"
+		"MatomoHooks": "MatomoHooks.php"
 	},
 	"ExtensionMessagesFiles": {
 		"MatomoMagic": "Matomo.i18n.magic.php"
