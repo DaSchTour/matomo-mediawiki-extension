@@ -14,6 +14,29 @@ class MatomoHooks {
 	/** @var array Collection of additional Matomo callbacks */
 	private static $MatomoCallbacks = [];
 
+	/** @var User current MediaWiki user */
+	private static $user = null;
+
+	/**
+	 * Remember user for use in isMatomoDisabled() and addMatomoScript()
+	 *
+	 * This method is called from various hooks to get the current user.
+	 * Multiple call ensure that a hook is run on each page as some are
+	 * only fired on the search page.
+	 *
+	 * @param      User  $user
+	 *
+	 * @return     true
+	 */
+	private static function rememberUser( User $user = null ) {
+
+		if ( $user instanceof User ) {
+			self::$user = $user;
+		}
+
+		return true;
+	}
+
 	/**
 	 * Check if Matomo is disabled (to skip all processing)
 	 *
@@ -21,23 +44,23 @@ class MatomoHooks {
 	 */
 	private static function isMatomoDisabled() {
 
-		global $wgUser;
-
-		// TODO: use of $wgUser is deprecated, see: https://www.mediawiki.org/wiki/Manual:User.php#See_also
-		$user = $wgUser;
+		// if user could not be determined, disable Matomo (just in case, this should not happen)
+		if ( null === self::$user ) {
+			return true;
+		}
 
 		// Disable Matomo for Wiki Editors (if configured)
-		if ( $user->isAllowed( 'edit' ) && self::getParameter( 'IgnoreEditors' ) ) {
+		if ( self::$user->isAllowed( 'edit' ) && self::getParameter( 'IgnoreEditors' ) ) {
 			return true;
 		}
 
 		// Disable Matomo for bots (if configured)
-		if ( $user->isAllowed( 'bot' ) && self::getParameter( 'IgnoreBots' ) ) {
+		if ( self::$user->isAllowed( 'bot' ) && self::getParameter( 'IgnoreBots' ) ) {
 			return true;
 		}
 
 		// Disable Matomo for Wiki System Operators (if configured)
-		if ( $user->isAllowed( 'protect' ) && self::getParameter( 'IgnoreSysops' ) ) {
+		if ( self::$user->isAllowed( 'protect' ) && self::getParameter( 'IgnoreSysops' ) ) {
 			return true;
 		}
 
@@ -69,7 +92,7 @@ class MatomoHooks {
 	 *
 	 * @param      mixed  $callbacks  Matomo callback(s) (type: string|array)
 	 *
-	 * @return     true
+	 * @return     bool   true
 	 */
 	private static function addMatomoCallbacks( $callbacks = null ) {
 
@@ -97,22 +120,43 @@ class MatomoHooks {
 		return implode( PHP_EOL, self::$MatomoCallbacks );
 	}
 
+	##
+	## Hint: hooks are sorted here according to the order they are fired
+	##
+
 	/**
-	 * Hook: Insert Matomo script before closing <body>
+	 * Hook: Register parser tag for Matomo opt out
 	 *
-	 * @param      string  $skin
-	 * @param      string  &$text
+	 * @param      Parser  $parser
 	 *
-	 * @return     bool
+	 * @return     bool    true
 	 */
-	public static function onSkinAfterBottomScripts( $skin, &$text = '' ) {
+	public static function onParserFirstCallInit( Parser $parser ) {
+
+		$parser->setHook( 'matomo-optout', [ self::class, 'parserTagMatomoOptOut'] );
+
+		return true;
+	}
+
+	/**
+	 * Hook: Save some additional data in Special:Search.
+	 *
+	 * @param      SpecialSearch  $search   Special page.
+	 * @param      string|null    $profile  Search profile.
+	 * @param      SearchEngine   $engine   Search engine.
+	 *
+	 * @return     bool           true
+	 */
+	public static function onSpecialSearchSetupEngine( SpecialSearch $search, string $profile, SearchEngine $engine ) {
+
+		self::rememberUser( $search->getUser() );
 
 		// skip if Matomo is disabled
 		if ( self::isMatomoDisabled() ) {
 			return true;
 		}
 
-		$text .= self::addMatomoScript( $skin->getTitle() );
+		self::$searchProfile = $profile;
 
 		return true;
 	}
@@ -124,9 +168,9 @@ class MatomoHooks {
 	 * @param      SearchResultSet|null  $titleMatches  Results in the titles.
 	 * @param      SearchResultSet|null  $textMatches   Results in the fulltext.
 	 *
-	 * @return     true
+	 * @return     bool                  true
 	 */
-	public static function onSpecialSearchResults( $term, $titleMatches, $textMatches ) {
+	public static function onSpecialSearchResults( string $term, ISearchResultSet $titleMatches = null, ISearchResultSet $textMatches = null ) {
 
 		// skip if Matomo is disabled
 		if ( self::isMatomoDisabled() ) {
@@ -147,35 +191,16 @@ class MatomoHooks {
 	}
 
 	/**
-	 * Hook: Save some additional data in Special:Search.
-	 *
-	 * @param      SpecialSearch  $search   Special page.
-	 * @param      string|null    $profile  Search profile.
-	 * @param      SearchEngine   $engine   Search engine.
-	 *
-	 * @return     true
-	 */
-	public static function onSpecialSearchSetupEngine( $search, $profile, $engine ) {
-
-		// skip if Matomo is disabled
-		if ( self::isMatomoDisabled() ) {
-			return true;
-		}
-
-		self::$searchProfile = $profile;
-
-		return true;
-	}
-
-	/**
 	 * Hook: Insert JavaScript for Matomo opt out
 	 *
 	 * @param      OutputPage  $out
 	 * @param      Skin        $skin
 	 *
-	 * @return     true
+	 * @return     bool        true
 	 */
 	public static function onBeforePageDisplay( OutputPage $out, Skin $skin ) {
+
+		self::rememberUser( $out->getUser() );
 
 		// skip if Matomo is disabled
 		if ( self::isMatomoDisabled() ) {
@@ -188,15 +213,23 @@ class MatomoHooks {
 	}
 
 	/**
-	 * Hook: Register parser tag for Matomo opt out
+	 * Hook: Insert Matomo script before closing <body>
 	 *
-	 * @param      Parser  $parser
+	 * @param      Skin    $skin
+	 * @param      string  $text
 	 *
-	 * @return     true
+	 * @return     bool    true
 	 */
-	public static function onParserFirstCallInit( Parser $parser ) {
+	public static function onSkinAfterBottomScripts( Skin $skin, string &$text = '' ) {
 
-		$parser->setHook( 'matomo-optout', [ self::class, 'parserTagMatomoOptOut'] );
+		self::rememberUser( $skin->getUser() );
+
+		// skip if Matomo is disabled
+		if ( self::isMatomoDisabled() ) {
+			return true;
+		}
+
+		$text .= self::addMatomoScript( $skin->getTitle() );
 
 		return true;
 	}
@@ -237,7 +270,7 @@ OPTOUT;
 	 */
 	private static function addMatomoScript( $title ) {
 
-		global $wgUser, $wgServer;
+		global $wgServer;
 
 		## Configure paths and site ID
 
@@ -282,11 +315,10 @@ OPTOUT;
 			self::addMatomoCallbacks( '_paq.push(["disableCookies"]);' );
 		}
 
-		// Track username based on https://matomo.org/docs/user-id/ The user
-		// name for anonymous visitors is their IP address which Matomo already
-		// records.
-		if ( self::getParameter( 'TrackUsernames' ) && $wgUser->isLoggedIn()) {
-			$username = Xml::encodeJsVar( $wgUser->getName() );
+		// Track username based on https://matomo.org/docs/user-id/ The user name
+		// for anonymous visitors is their IP address which Matomo already records.
+		if ( self::getParameter( 'TrackUsernames' ) && self::$user instanceof User && self::$user->isLoggedIn() ) {
+			$username = Xml::encodeJsVar( self::$user->getName() );
 			self::addMatomoCallbacks( "_paq.push(['setUserId',{$username}]);" );
 		}
 
