@@ -187,11 +187,6 @@ class MatomoHooks {
 	 */
 	public static function onParserFirstCallInit( Parser $parser ) {
 
-		// skip if Matomo is disabled
-		if ( self::isMatomoDisabled() ) {
-			return true;
-		}
-
 		$parser->setHook( 'matomo-optout', [ self::class, 'parserTagMatomoOptOut'] );
 
 		return;
@@ -209,11 +204,14 @@ class MatomoHooks {
 	 */
 	public static function parserTagMatomoOptOut( $in, array $param, Parser $parser, PPFrame $frame ) {
 
+		// this message is displayed if Matomo is disabled (otherwise MatomoOptOut.js will overwrite this)
+		$msg = wfMessage( 'matomo-disabled' );
+
 		$html = <<<OPTOUT
 <html>
   <p>
     <input type="checkbox" id="matomo-optout" />
-    <label for="matomo-optout"><strong></strong></label>
+    <label for="matomo-optout"><strong>${msg}</strong></label>
   </p>
 </html>
 OPTOUT;

@@ -1,6 +1,6 @@
 {
 	"name": "Matomo",
-	"version": "4.2.1",
+	"version": "4.2.2",
 	"author": [
 		"Isb1009",
 		"[http://www.daschmedia.de DaSch]",
@@ -9,11 +9,16 @@
 		"[https://www.gruniversal.de David Gruner]"
 	],
 	"url": "https://www.mediawiki.org/wiki/Extension:Matomo",
-	"description": "Adding Matomo Tracking Code",
+	"descriptionmsg": "matomo-desc",
 	"license-name": "GPL-2.0-or-later",
 	"type": "other",
 	"requires": {
 		"MediaWiki": ">= 1.25.0"
+	},
+	"MessagesDirs": {
+		"Matomo": [
+			"i18n"
+		]
 	},
 	"config": {
 		"MatomoIDSite": "",
