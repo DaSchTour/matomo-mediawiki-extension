@@ -3,9 +3,9 @@ Mamoto extension for MediaWiki
 Version 4.2.0
  - Last update: 24 January 2021
 
-This the Matomo (ex-Piwik) integration extension for MediaWiki
-software. The extension is only useful if you've got a MediaWiki
-installation; it can only be installed by the administrator of the site.
+This the Matomo (ex-Piwik) integration extension for MediaWiki software.
+The extension is only useful if you've got a MediaWiki installation;
+it can only be installed by the administrator of the site.
 
 Minimum requirements
 --------------------------------
@@ -16,32 +16,27 @@ Minimum requirements
 
 Installation instructions
 ---------------------------------
-Please, read them carefully. They're not very difficult to understand,
-but **ALL** steps are necessary:
+Please, read them carefully. They're not very difficult to understand, but **ALL** steps are necessary:
 
 1. Create a folder called "Matomo" in your extensions directory
 
 2. Upload extension.json and Matomo.hooks.php in the "Matomo" folder you've just created
 
-3. Edit your LocalSettings.php and, at the end of the file, add the
-  following:
+3. Edit your LocalSettings.php and, at the end of the file, add the following:
 
-        ```wfLoadExtension( 'Matomo' );```
-
+  ```wfLoadExtension( 'Matomo' );```
 
 4. Configure the Matomo URL and site-id. To do so; edit the LocalSettings and set up the following variables:
-      > $wgMatomoURL = "matomo-host.tld/dir/";
 
-      > $wgMatomoIDSite = "matomo_idsite";
+  ```$wgMatomoURL = "https://your-matomo-server.tld/matomo/matomo.php";```
+  
+  ```$wgMatomoIDSite = 1;```
 
-      **IMPORTANT** Do not define the protocol of the $wgMatomoURL
-
-  Note: Change the value of $wgMatomoURL with the URL, without the protocol
-	but including the domain name, where you installed Matomo.
-	Remember to add the trailing slash!
+  Note: Until version 4.2.0 $wgMatomoURL had to be defined without protocol and filename (e.g. "matomo-host.tld/dir/"). This configuration will still work but is deprecated.
 
 5. Enjoy our extension!
-> Note: to check if the extension has successfully installed; go to your wiki and check if the Matomo extension is present on the bottom of the Wiki source code.
+
+  Note: to check if the extension has successfully installed; go to your wiki and check if the Matomo extension is present on the bottom of the Wiki source code.
 
 
 Custom variables
@@ -54,13 +49,15 @@ Custom variables
 * Ignore sysop users: set ```$wgMatomoIgnoreSysops``` to ```true``` (default: ```true```)
 
 * To define custom javascript tags in the Matomo javascript code, its possible to define the $wgMatomoCustomJS variable. For example if you have a single setting to insert; use the following code:
-   > ```$wgMatomoCustomJS = "_paq.push(['trackGoal', '1']);"```
 
-   If you have multiple variables to define; use an array. For example:
->`` $wgMatomoCustomJS = array(
-"_paq.push(['setCustomVariable', '1','environment','production']);",
-"_paq.push(['setCustomVariable', '1','is_user','yes']);"
-);``
+  ```$wgMatomoCustomJS = "_paq.push(['trackGoal', '1']);"```
+
+  If you have multiple variables to define; use an array. For example:
+
+  `` $wgMatomoCustomJS = array(
+  "_paq.push(['setCustomVariable', '1','environment','production']);",
+  "_paq.push(['setCustomVariable', '1','is_user','yes']);"
+  );``
 
 * If you want to track the username of the visitor with the Matomo feature User ID (needs Matomo >= 2.7.0) 
   set the ```$wgMatomoTrackUsernames``` to true in LocalSettings.php.
