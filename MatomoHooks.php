@@ -317,7 +317,7 @@ OPTOUT;
 
 		// Track username based on https://matomo.org/docs/user-id/ The user name
 		// for anonymous visitors is their IP address which Matomo already records.
-		if ( self::getParameter( 'TrackUsernames' ) && self::$user instanceof User && self::$user->isLoggedIn() ) {
+		if ( self::getParameter( 'TrackUsernames' ) && self::$user instanceof User && self::$user->isRegistered() ) {
 			$username = Xml::encodeJsVar( self::$user->getName() );
 			self::addMatomoCallbacks( "_paq.push(['setUserId',{$username}]);" );
 		}
