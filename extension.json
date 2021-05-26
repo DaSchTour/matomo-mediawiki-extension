@@ -21,11 +21,8 @@
 		"MatomoIgnoreSysops": true,
 		"MatomoIgnoreBots": true,
 		"MatomoCustomJS": "",
-		"MatomoUsePageTitle": false,
-		"MatomoActionName": "",
 		"MatomoDisableCookies": false,
 		"MatomoProtocol": "auto",
-		"MatomoUsernameCustomVariable": [],
 		"MatomoTrackUsernames": false,
 		"MatomoJSFileURL": null
 	},

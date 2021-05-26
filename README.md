@@ -62,12 +62,5 @@ Custom variables
 "_paq.push(['setCustomVariable', '1','is_user','yes']);"
 );``
 
-* If you want to change the title of your pages inside the Matomo tracker,
-  you can set ```$wgMatomoActionName``` inside your LocalSettings.php file.
-
-* In case you want to include the title as, for example,
-   "wiki/Title of the page", you can set ```$wgMatomoUsePageTitle``` to
-  ```true``` and set ```$wgMatomoActionName``` to ```wiki/```. The extension will print matomo_action_name = 'wiki/Title of the page';
-
 * If you want to track the username of the visitor with the Matomo feature User ID (needs Matomo >= 2.7.0) 
   set the ```$wgMatomoTrackUsernames``` to true in LocalSettings.php.

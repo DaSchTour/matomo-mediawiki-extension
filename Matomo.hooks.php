@@ -172,13 +172,6 @@ OPTOUT;
 			return '<!-- You need to set the settings for Matomo -->';
 		}
 
-		// TODO: remove, as parameters are not used any more
-		// see: https://github.com/DaSchTour/matomo-mediawiki-extension/issues/22
-		$finalActionName = self::getParameter( 'ActionName' );
-		if ( self::getParameter( 'UsePageTitle' ) ) {
-			$finalActionName .= $title->getPrefixedText();
-		}
-
 		// Check if disablecookies flag
 		if ( self::getParameter( 'DisableCookies' ) ) {
 			$disableCookiesStr = PHP_EOL . '  _paq.push(["disableCookies"]);';
@@ -250,9 +243,6 @@ OPTOUT;
 			}
 
 		}
-
-		// Prevent XSS
-		$finalActionName = Xml::encodeJsVar( $finalActionName );
 
 		// If $wgMatomoJSFileURL is null the locations are $wgMatomoURL/piwik.php and $wgMatomoURL/piwik.js
 		// Else they are $wgMatomoURL/piwik.php and $wgMatomoJSFileURL
