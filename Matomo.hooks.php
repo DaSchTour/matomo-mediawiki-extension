@@ -13,63 +13,76 @@ class MatomoHooks {
 
 	/**
 	 * Initialize the Matomo hook
-	 * 
-	 * @param string $skin
-	 * @param string $text
-	 * @return bool
+	 *
+	 * @param      string  $skin
+	 * @param      string  $text
+	 *
+	 * @return     bool
 	 */
-	public static function MatomoSetup ($skin, &$text = '')
-	{
+	public static function MatomoSetup ($skin, &$text = '')	{
+
 		$text .= self::addMatomo( $skin->getTitle() );
+
 		return true;
 	}
 
 	/**
 	 * Get parameter with either the new prefix $wgMatomo or the old $wgPiwik.
 	 *
-	 * @param string $name Parameter name without any prefix.
-	 * @return mixed|null Parameter value.
+	 * @param      string      $name   Parameter name without any prefix.
+	 *
+	 * @return     mixed|null  Parameter value.
 	 */
 	public static function getParameter( $name ) {
+
 		$config = \MediaWiki\MediaWikiServices::getInstance()->getMainConfig();
+
 		if ( $config->has( "Piwik$name" ) ) {
 			return $config->get( "Piwik$name" );
 		} elseif ( $config->has( "Matomo$name" ) ) {
 			return $config->get( "Matomo$name" );
 		}
+
 		return null;
 	}
 
 	/**
 	 * Hook to save some data in Special:Search.
 	 *
-	 * @param string $term Searched term.
-	 * @param SearchResultSet|null $titleMatches Results in the titles.
-	 * @param SearchResultSet|null $textMatches Results in the fulltext.
-	 * @return true
+	 * @param      string                $term          Searched term.
+	 * @param      SearchResultSet|null  $titleMatches  Results in the titles.
+	 * @param      SearchResultSet|null  $textMatches   Results in the fulltext.
+	 *
+	 * @return     true
 	 */
 	public static function onSpecialSearchResults( $term, $titleMatches, $textMatches ) {
+
 		self::$searchTerm = $term;
 		self::$searchCount = 0;
-		if( $titleMatches instanceof SearchResultSet ) {
+
+		if ( $titleMatches instanceof SearchResultSet ) {
 			self::$searchCount += (int) $titleMatches->numRows();
 		}
-		if( $textMatches instanceof SearchResultSet ) {
+		if ( $textMatches instanceof SearchResultSet ) {
 			self::$searchCount += (int) $textMatches->numRows();
 		}
+
 		return true;
 	}
 
 	/**
 	 * Hook to save some data in Special:Search.
 	 *
-	 * @param SpecialSearch $search Special page.
-	 * @param string|null $profile Search profile.
-	 * @param SearchEngine $engine Search engine.
-	 * @return true
+	 * @param      SpecialSearch  $search   Special page.
+	 * @param      string|null    $profile  Search profile.
+	 * @param      SearchEngine   $engine   Search engine.
+	 *
+	 * @return     true
 	 */
 	public static function onSpecialSearchSetupEngine( $search, $profile, $engine ) {
+
 		self::$searchProfile = $profile;
+
 		return true;
 	}
 
@@ -98,7 +111,16 @@ class MatomoHooks {
 		return;
 	}
 
-	// Parser tag function: <matomo-optout />
+	/**
+	 * Parser tag function: <matomo-optout />
+	 *
+	 * @param      mixed    $in
+	 * @param      array    $param
+	 * @param      Parser   $parser
+	 * @param      PPFrame  $frame
+	 *
+	 * @return     string   html
+	 */
 	public static function parserTagMatomoOptOut( $in, array $param, Parser $parser, PPFrame $frame ) {
 
 		$html = <<<OPTOUT
@@ -115,8 +137,10 @@ OPTOUT;
 
 	/**
 	 * Add Matomo script
-	 * @param string $title
-	 * @return string
+	 *
+	 * @param      string  $title
+	 *
+	 * @return     string
 	 */
 	public static function addMatomo ($title) {
 
@@ -143,7 +167,7 @@ OPTOUT;
 		$customJS = self::getParameter( 'CustomJS' );
 		$jsFileURL = self::getParameter( 'JSFileURL' );
 
-		// Missing configuration parameters 
+		// Missing configuration parameters
 		if ( empty( $idSite ) || empty( $matomoURL ) ) {
 			return '<!-- You need to set the settings for Matomo -->';
 		}
@@ -159,17 +183,17 @@ OPTOUT;
 		} else $disableCookiesStr = null;
 
 		// Check if we have custom JS
-		if (!empty($customJS)) {
+		if ( !empty($customJS) ) {
 
 			// Check if array is given
 			// If yes we have multiple lines/variables to declare
-			if (is_array($customJS)) {
+			if ( is_array($customJS) ) {
 
 				// Make empty string with a new line
 				$customJs = PHP_EOL;
 
 				// Store the lines in the $customJs line
-				foreach ($customJS as $customJsLine) { 
+				foreach ( $customJS as $customJsLine ) {
 					$customJs .= $customJsLine;
 				}
 
@@ -183,7 +207,8 @@ OPTOUT;
 	$trackingType = 'trackPageView';
 	$jsTrackingSearch = '';
 	$urlTrackingSearch = '';
-	if( !is_null( self::$searchTerm ) ) {
+	if ( !is_null( self::$searchTerm ) ) {
+
 		// JavaScript
 		$trackingType = 'trackSiteSearch';
 		$jsTerm = Xml::encodeJsVar( self::$searchTerm );
@@ -207,23 +232,23 @@ OPTOUT;
         // records.
         if ( self::getParameter( 'TrackUsernames' ) && $wgUser->isLoggedIn()) {
             $username = Xml::encodeJsVar( $wgUser->getName() );
-            $customJs .= PHP_EOL . "  _paq.push([\"setUserId\",{$username}]);";
+            $customJs .= PHP_EOL . "  _paq.push(['setUserId',{$username}]);";
         }
 
 		// Check if server uses https
 		if ( $protocol == 'auto' ) {
-			
-			if (isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] == 'on' || $_SERVER['HTTPS'] == 1) || isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https') {
+
+			if ( isset( $_SERVER['HTTPS'] ) && ( $_SERVER['HTTPS'] == 'on' || $_SERVER['HTTPS'] == 1 ) || isset( $_SERVER['HTTP_X_FORWARDED_PROTO'] ) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https' ) {
 				$protocol = 'https';
 			} else {
 				$protocol = 'http';
 			}
-			
+
 		}
-		
+
 		// Prevent XSS
 		$finalActionName = Xml::encodeJsVar( $finalActionName );
-		
+
 		// If $wgMatomoJSFileURL is null the locations are $wgMatomoURL/piwik.php and $wgMatomoURL/piwik.js
 		// Else they are $wgMatomoURL/piwik.php and $wgMatomoJSFileURL
 		$jsMatomoURL = '';
@@ -260,7 +285,6 @@ OPTOUT;
 MATOMO;
 
 		return $script;
-		
 	}
-	
+
 }
