@@ -23,18 +23,21 @@ class MatomoHooks {
 
 		global $wgUser;
 
+		// TODO: use of $wgUser is deprecated, see: https://www.mediawiki.org/wiki/Manual:User.php#See_also
+		$user = $wgUser;
+
 		// Disable Matomo for Wiki Editors (if configured)
-		if ( $wgUser->isAllowed( 'edit' ) && self::getParameter( 'IgnoreEditors' ) ) {
+		if ( $user->isAllowed( 'edit' ) && self::getParameter( 'IgnoreEditors' ) ) {
 			return true;
 		}
 
 		// Disable Matomo for bots (if configured)
-		if ( $wgUser->isAllowed( 'bot' ) && self::getParameter( 'IgnoreBots' ) ) {
+		if ( $user->isAllowed( 'bot' ) && self::getParameter( 'IgnoreBots' ) ) {
 			return true;
 		}
 
 		// Disable Matomo for Wiki System Operators (if configured)
-		if ( $wgUser->isAllowed( 'protect' ) && self::getParameter( 'IgnoreSysops' ) ) {
+		if ( $user->isAllowed( 'protect' ) && self::getParameter( 'IgnoreSysops' ) ) {
 			return true;
 		}
 
