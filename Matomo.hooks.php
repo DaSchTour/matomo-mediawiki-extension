@@ -74,6 +74,46 @@ class MatomoHooks {
 	}
 
 	/**
+	 * Insert javascript for matomo opt out
+	 *
+	 * @param      OutputPage  $out
+	 * @param      Skin        $skin
+	 */
+	public static function onBeforePageDisplay( OutputPage $out, Skin $skin ) {
+
+		$out->addScriptFile( '/extensions/Matomo/MatomoOptOut.js' );
+
+		return;
+	}
+
+	/**
+	 * Register parser tag for matomo opt out
+	 *
+	 * @param      Parser  $parser
+	 */
+	public static function onParserFirstCallInit( Parser $parser ) {
+
+		$parser->setHook( 'matomo-optout', [ self::class, 'parserTagMatomoOptOut'] );
+
+		return;
+	}
+
+	// Parser tag function: <matomo-optout />
+	public static function parserTagMatomoOptOut( $in, array $param, Parser $parser, PPFrame $frame ) {
+
+		$html = <<<OPTOUT
+<html>
+  <p>
+    <input type="checkbox" id="matomo-optout" />
+    <label for="matomo-optout"><strong></strong></label>
+  </p>
+</html>
+OPTOUT;
+
+		return $html;
+	}
+
+	/**
 	 * Add Matomo script
 	 * @param string $title
 	 * @return string
