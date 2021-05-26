@@ -11,6 +11,40 @@ class MatomoHooks {
 	/** @var int|null Number of results in Special:Search. */
 	public static $searchCount = null;
 
+	/** @var array Collection of additional matomo callbacks */
+	public static $MatomoCallbacks = [];
+
+	/**
+	 * Add an array or a single callback to the list of additional matomo callbacks
+	 *
+	 * @param      string|array  $customJS  matomo callback(s)
+	 */
+	public static function addMatomoCallbacks( $callbacks = null ) {
+
+		// recursion: add array of callbacks
+		if ( is_array( $callbacks ) ) {
+			foreach ( $callbacks as $callback ) {
+				self::addMatomoCallbacks( $callback );
+			}
+			return;
+		}
+
+		// add single callback
+		self::$MatomoCallbacks[] = '  ' . trim( $callbacks );
+
+		return;
+	}
+
+	/**
+	 * Get the list of additional matomo callbacks as string
+	 *
+	 * @return     string
+	 */
+	public static function getMatomoCallbacks() {
+
+		return implode( PHP_EOL, self::$MatomoCallbacks );
+	}
+
 	/**
 	 * Initialize the Matomo hook
 	 *
@@ -19,7 +53,7 @@ class MatomoHooks {
 	 *
 	 * @return     bool
 	 */
-	public static function onSkinAfterBottomScripts ($skin, &$text = '')	{
+	public static function onSkinAfterBottomScripts($skin, &$text = '')	{
 
 		$text .= self::addMatomo( $skin->getTitle() );
 
@@ -142,7 +176,7 @@ OPTOUT;
 	 *
 	 * @return     string
 	 */
-	public static function addMatomo ($title) {
+	public static function addMatomo( $title ) {
 
 		global $wgUser, $wgScriptPath, $wgServer;
 
@@ -202,35 +236,29 @@ OPTOUT;
 		$idSite = (int) self::getParameter( 'IDSite' ) ?: 1;
 
 
-		## more
+		## Javascript callbacks
 
-		$customJS = self::getParameter( 'CustomJS' );
-
-		// Check if disablecookies flag
+		// Disable cookies for cookie-less tracking
 		if ( self::getParameter( 'DisableCookies' ) ) {
-			$disableCookiesStr = PHP_EOL . '  _paq.push(["disableCookies"]);';
-		} else $disableCookiesStr = null;
+			self::addMatomoCallbacks( '_paq.push(["disableCookies"]);' );
+		}
 
-		// Check if we have custom JS
-		if ( !empty( $customJS ) ) {
+		// Track username based on https://matomo.org/docs/user-id/ The user
+        // name for anonymous visitors is their IP address which Matomo already
+        // records.
+        if ( self::getParameter( 'TrackUsernames' ) && $wgUser->isLoggedIn()) {
+            $username = Xml::encodeJsVar( $wgUser->getName() );
+            self::addMatomoCallbacks( "_paq.push(['setUserId',{$username}]);" );
+        }
 
-			// Check if array is given
-			// If yes we have multiple lines/variables to declare
-			if ( is_array( $customJS ) ) {
+        // add Custom JS (defaults to empty string)
+        $customJS = self::getParameter( 'CustomJS' ) ?: '';
+        self::addMatomoCallbacks( $customJS );
 
-				// Make empty string with a new line
-				$customJs = PHP_EOL;
+        // create complete list of callbacks
+		$matomoCallbacks = self::getMatomoCallbacks();
 
-				// Store the lines in the $customJs line
-				foreach ( $customJS as $customJsLine ) {
-					$customJs .= $customJsLine;
-				}
-
-			// CustomJs is string
-			} else $customJs = PHP_EOL . $customJS;
-
-		// Contents are empty
-		} else $customJs = null;
+		## Tracking type
 
 		// Track search results
 		$trackingType = 'trackPageView';
@@ -256,19 +284,12 @@ OPTOUT;
 			$urlTrackingSearch = '&' . wfArrayToCgi( $urlTrackingSearch );
 		}
 
-        // Track username based on https://matomo.org/docs/user-id/ The user
-        // name for anonymous visitors is their IP address which Matomo already
-        // records.
-        if ( self::getParameter( 'TrackUsernames' ) && $wgUser->isLoggedIn()) {
-            $username = Xml::encodeJsVar( $wgUser->getName() );
-            $customJs .= PHP_EOL . "  _paq.push(['setUserId',{$username}]);";
-        }
-
 		// Matomo script
 		$script = <<<MATOMO
 <!-- Matomo -->
 <script type="text/javascript">
-  var _paq = _paq || [];{$disableCookiesStr}{$customJs}
+  var _paq = _paq || [];
+{$matomoCallbacks}
   _paq.push(["{$trackingType}"{$jsTrackingSearch}]);
   _paq.push(["enableLinkTracking"]);
 
