@@ -144,7 +144,10 @@ OPTOUT;
 	 */
 	public static function addMatomo ($title) {
 
-		global $wgUser, $wgScriptPath;
+		global $wgUser, $wgScriptPath, $wgServer;
+
+
+		## Disable Matomo for some users
 
 		// Is Matomo disabled for bots?
 		if ( $wgUser->isAllowed( 'bot' ) && self::getParameter( 'IgnoreBots' ) ) {
@@ -161,16 +164,47 @@ OPTOUT;
 			return "<!-- Matomo tracking is disabled for users with 'edit' rights -->";
 		}
 
-		$idSite = self::getParameter( 'IDSite' );
-		$matomoURL = self::getParameter( 'URL' );
-		$protocol = self::getParameter( 'Protocol' );
-		$customJS = self::getParameter( 'CustomJS' );
-		$jsFileURL = self::getParameter( 'JSFileURL' );
 
-		// Missing configuration parameters
-		if ( empty( $idSite ) || empty( $matomoURL ) ) {
-			return '<!-- You need to set the settings for Matomo -->';
+		## Configure paths and site ID
+
+		// Matomo URL defaults to $wgServer.'/matomo/matomo.php'
+		$matomoURL = self::getParameter( 'URL' ) ?: $wgServer . '/matomo/matomo.php';
+
+		// Matomo JS URL defaults to the same place
+		$matomoJSFileURL = str_replace( 'matomo.php', 'matomo.js', $matomoURL );
+
+		// fallback for old configurations without full URL
+		if ( strpos( $matomoURL, '://' ) === false ) {
+
+			// figure out protocol type
+			$protocol = self::getParameter( 'Protocol' );
+			if ( $protocol == 'auto' ) {
+				if ( isset( $_SERVER['HTTPS'] ) && ( $_SERVER['HTTPS'] == 'on' || $_SERVER['HTTPS'] == 1 ) || isset( $_SERVER['HTTP_X_FORWARDED_PROTO'] ) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https' ) {
+					$protocol = 'https';
+				} else {
+					$protocol = 'http';
+				}
+			}
+
+			// add protocol and old naming "piwik.php"
+			$matomoURL = $protocol . '://' . $matomoURL . '/piwik.php';
+			$matomoJSFileURL = str_replace( 'piwik.php', 'piwik.js', $matomoURL );
 		}
+
+		// use different JS URL if given
+		$matomoJSFileURL = self::getParameter( 'JSFileURL' ) ?: $matomoJSFileURL;
+
+		// encode paths for javascript
+		$jsMatomoURL = Xml::encodeJsVar( $matomoURL );
+		$jsMatomoJSFileURL = Xml::encodeJsVar( $matomoJSFileURL );
+
+		// Site-ID defaults to 1
+		$idSite = (int) self::getParameter( 'IDSite' ) ?: 1;
+
+
+		## more
+
+		$customJS = self::getParameter( 'CustomJS' );
 
 		// Check if disablecookies flag
 		if ( self::getParameter( 'DisableCookies' ) ) {
@@ -230,32 +264,6 @@ OPTOUT;
             $customJs .= PHP_EOL . "  _paq.push(['setUserId',{$username}]);";
         }
 
-        // TODO: check, it assumes that Matomo runs on the same server
-        // TODO: check, also it would be easier to use $wgMatomoURL with given protocol
-        // see: https://github.com/DaSchTour/matomo-mediawiki-extension/issues/28
-		// Check if server uses https
-		if ( $protocol == 'auto' ) {
-
-			if ( isset( $_SERVER['HTTPS'] ) && ( $_SERVER['HTTPS'] == 'on' || $_SERVER['HTTPS'] == 1 ) || isset( $_SERVER['HTTP_X_FORWARDED_PROTO'] ) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https' ) {
-				$protocol = 'https';
-			} else {
-				$protocol = 'http';
-			}
-
-		}
-
-		// If $wgMatomoJSFileURL is null the locations are $wgMatomoURL/piwik.php and $wgMatomoURL/piwik.js
-		// Else they are $wgMatomoURL/piwik.php and $wgMatomoJSFileURL
-		$jsMatomoURL = '';
-		$jsMatomoURLCommon = '';
-		if( is_null( $jsFileURL ) ) {
-			$jsFileURL = 'piwik.js';
-			$jsMatomoURLCommon = '+' . Xml::encodeJsVar( $matomoURL . '/' );
-		} else {
-			$jsMatomoURL = '+' . Xml::encodeJsVar( $matomoURL . '/' );
-		}
-		$jsMatomoJSFileURL = Xml::encodeJsVar( $jsFileURL );
-
 		// Matomo script
 		$script = <<<MATOMO
 <!-- Matomo -->
@@ -265,17 +273,16 @@ OPTOUT;
   _paq.push(["enableLinkTracking"]);
 
   (function() {
-    var u = (("https:" == document.location.protocol) ? "https" : "http") + "://"{$jsMatomoURLCommon};
-    _paq.push(["setTrackerUrl", u{$jsMatomoURL}+"piwik.php"]);
+    _paq.push(["setTrackerUrl", {$jsMatomoURL}]);
     _paq.push(["setSiteId", "{$idSite}"]);
     var d=document, g=d.createElement("script"), s=d.getElementsByTagName("script")[0]; g.type="text/javascript";
-    g.defer=true; g.async=true; g.src=u+{$jsMatomoJSFileURL}; s.parentNode.insertBefore(g,s);
+    g.defer=true; g.async=true; g.src={$jsMatomoJSFileURL}; s.parentNode.insertBefore(g,s);
   })();
 </script>
 <!-- End Matomo Code -->
 
 <!-- Matomo Image Tracker -->
-<noscript><img src="{$protocol}://{$matomoURL}/piwik.php?idsite={$idSite}&rec=1{$urlTrackingSearch}" style="border:0" alt="" /></noscript>
+<noscript><img src="{$matomoURL}?idsite={$idSite}&rec=1{$urlTrackingSearch}" style="border:0" alt="" /></noscript>
 <!-- End Matomo -->
 MATOMO;
 
