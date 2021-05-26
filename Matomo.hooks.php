@@ -258,19 +258,23 @@ OPTOUT;
         // create complete list of callbacks
 		$matomoCallbacks = self::getMatomoCallbacks();
 
+
 		## Tracking type
 
-		// Track search results
+		// tracking type defaults to 'trackPageView'
 		$trackingType = 'trackPageView';
+
+		// Track search results
 		$jsTrackingSearch = '';
 		$urlTrackingSearch = '';
 		if ( !is_null( self::$searchTerm ) ) {
 
-			// JavaScript
 			$trackingType = 'trackSiteSearch';
+
+			// JavaScript
 			$jsTerm = Xml::encodeJsVar( self::$searchTerm );
-			$jsCategory = is_null( self::$searchProfile ) ? 'false' : Xml::encodeJsVar( self::$searchProfile );
-			$jsResultsCount = is_null( self::$searchCount ) ? 'false' : self::$searchCount;
+			$jsCategory = Xml::encodeJsVar( self::$searchProfile ) ?: 'false';
+			$jsResultsCount = Xml::encodeJsVar( self::$searchCount ) ?: 'false';
 			$jsTrackingSearch = ",$jsTerm,$jsCategory,$jsResultsCount";
 
 			// URL
