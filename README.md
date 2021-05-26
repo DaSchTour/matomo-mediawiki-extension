@@ -1,11 +1,13 @@
 Mamoto extension for MediaWiki
 ==============================
+
 Version 4.2.0
  - Last update: 24 January 2021
 
 This the Matomo (ex-Piwik) integration extension for MediaWiki software.
 The extension is only useful if you've got a MediaWiki installation;
 it can only be installed by the administrator of the site.
+
 
 Minimum requirements
 --------------------------------
@@ -14,8 +16,10 @@ Minimum requirements
 
 2.  A Matomo (0.4+) installation with the site configured
 
+
 Installation instructions
 ---------------------------------
+
 Please, read them carefully. They're not very difficult to understand, but **ALL** steps are necessary:
 
 1. Create a folder called "Matomo" in your extensions directory
@@ -39,8 +43,24 @@ Please, read them carefully. They're not very difficult to understand, but **ALL
   Note: to check if the extension has successfully installed; go to your wiki and check if the Matomo extension is present on the bottom of the Wiki source code.
 
 
+Matomo opt out
+------------------------
+
+This extension offers a simple way to include an opt out mechanism into your pages.
+
+You only need to add this parser tag to your page (e.g. data protection):
+
+  ```<matomo-optout />```
+
+User can then toggle their consent status by clicking on the corresponding text.
+
+This can replace the none-responsive iframe opt-out and is inspired by this article:
+* https://developer.matomo.org/guides/tracking-javascript-guide#optional-creating-a-custom-opt-out-form
+
+
 Custom variables
 ------------------------
+
 * Disable cookies by setting  the ```$wgMatomoDisableCookies``` variable to ```false```.
   > For example: $wgMatomoDisableCookies = false;
 
