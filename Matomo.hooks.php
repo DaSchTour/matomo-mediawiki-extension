@@ -13,13 +13,12 @@ class MatomoHooks {
 
 	/**
 	 * Initialize the Matomo hook
-	 * 
+	 *
 	 * @param string $skin
-	 * @param string $text
+	 * @param string &$text
 	 * @return bool
 	 */
-	public static function MatomoSetup ($skin, &$text = '')
-	{
+	public static function MatomoSetup( $skin, &$text = '' ) {
 		$text .= self::addMatomo( $skin->getTitle() );
 		return true;
 	}
@@ -51,11 +50,11 @@ class MatomoHooks {
 	public static function onSpecialSearchResults( $term, $titleMatches, $textMatches ) {
 		self::$searchTerm = $term;
 		self::$searchCount = 0;
-		if( $titleMatches instanceof SearchResultSet ) {
-			self::$searchCount += (int) $titleMatches->numRows();
+		if ( $titleMatches instanceof SearchResultSet ) {
+			self::$searchCount += (int)$titleMatches->numRows();
 		}
-		if( $textMatches instanceof SearchResultSet ) {
-			self::$searchCount += (int) $textMatches->numRows();
+		if ( $textMatches instanceof SearchResultSet ) {
+			self::$searchCount += (int)$textMatches->numRows();
 		}
 		return true;
 	}
@@ -78,9 +77,8 @@ class MatomoHooks {
 	 * @param string $title
 	 * @return string
 	 */
-	public static function addMatomo ($title) {
-
-		global $wgUser, $wgScriptPath;
+	public static function addMatomo( $title ) {
+		global $wgUser;
 
 		// Is Matomo disabled for bots?
 		if ( $wgUser->isAllowed( 'bot' ) && self::getParameter( 'IgnoreBots' ) ) {
@@ -103,7 +101,7 @@ class MatomoHooks {
 		$customJS = self::getParameter( 'CustomJS' );
 		$jsFileURL = self::getParameter( 'JSFileURL' );
 
-		// Missing configuration parameters 
+		// Missing configuration parameters
 		if ( empty( $idSite ) || empty( $matomoURL ) ) {
 			return '<!-- You need to set the settings for Matomo -->';
 		}
@@ -116,79 +114,83 @@ class MatomoHooks {
 		// Check if disablecookies flag
 		if ( self::getParameter( 'DisableCookies' ) ) {
 			$disableCookiesStr = PHP_EOL . '  _paq.push(["disableCookies"]);';
-		} else $disableCookiesStr = null;
+		} else { $disableCookiesStr = null;
+		}
 
 		// Check if we have custom JS
-		if (!empty($customJS)) {
+		if ( !empty( $customJS ) ) {
 
 			// Check if array is given
 			// If yes we have multiple lines/variables to declare
-			if (is_array($customJS)) {
+			if ( is_array( $customJS ) ) {
 
 				// Make empty string with a new line
 				$customJs = PHP_EOL;
 
 				// Store the lines in the $customJs line
-				foreach ($customJS as $customJsLine) { 
+				foreach ( $customJS as $customJsLine ) {
 					$customJs .= $customJsLine;
 				}
 
 			// CustomJs is string
-			} else $customJs = PHP_EOL . $customJS;
+			} else { $customJs = PHP_EOL . $customJS;
+			}
 
 		// Contents are empty
-		} else $customJs = null;
+		} else { $customJs = null;
+		}
 
 	// Track search results
 	$trackingType = 'trackPageView';
 	$jsTrackingSearch = '';
 	$urlTrackingSearch = '';
-	if( !is_null( self::$searchTerm ) ) {
+	if ( self::$searchTerm !== null ) {
 		// JavaScript
 		$trackingType = 'trackSiteSearch';
 		$jsTerm = Xml::encodeJsVar( self::$searchTerm );
-		$jsCategory = is_null( self::$searchProfile ) ? 'false' : Xml::encodeJsVar( self::$searchProfile );
-		$jsResultsCount = is_null( self::$searchCount ) ? 'false' : self::$searchCount;
+		$jsCategory = self::$searchProfile === null ? 'false' : Xml::encodeJsVar( self::$searchProfile );
+		$jsResultsCount = self::$searchCount === null ? 'false' : self::$searchCount;
 		$jsTrackingSearch = ",$jsTerm,$jsCategory,$jsResultsCount";
 
 		// URL
 		$urlTrackingSearch = [ 'search' => self::$searchTerm ];
-		if( !is_null( self::$searchProfile ) ) {
+		if ( self::$searchProfile !== null ) {
 			$urlTrackingSearch += [ 'search_cat' => self::$searchProfile ];
 		}
-		if( !is_null( self::$searchCount ) ) {
+		if ( self::$searchCount !== null ) {
 			$urlTrackingSearch += [ 'search_count' => self::$searchCount ];
 		}
 		$urlTrackingSearch = '&' . wfArrayToCgi( $urlTrackingSearch );
 	}
 
-        // Track username based on https://matomo.org/docs/user-id/ The user
-        // name for anonymous visitors is their IP address which Matomo already
-        // records.
-        if ( self::getParameter( 'TrackUsernames' ) && $wgUser->isLoggedIn()) {
-            $username = Xml::encodeJsVar( $wgUser->getName() );
-            $customJs .= PHP_EOL . "  _paq.push([\"setUserId\",{$username}]);";
-        }
+		// Track username based on https://matomo.org/docs/user-id/ The user
+		// name for anonymous visitors is their IP address which Matomo already
+		// records.
+		if ( self::getParameter( 'TrackUsernames' ) && $wgUser->isLoggedIn() ) {
+			$username = Xml::encodeJsVar( $wgUser->getName() );
+			$customJs .= PHP_EOL . "  _paq.push([\"setUserId\",{$username}]);";
+		}
 
 		// Check if server uses https
 		if ( $protocol == 'auto' ) {
-			
-			if (isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] == 'on' || $_SERVER['HTTPS'] == 1) || isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https') {
+
+			if ( isset( $_SERVER['HTTPS'] ) && ( $_SERVER['HTTPS'] == 'on' || $_SERVER['HTTPS'] == 1 ) || isset( $_SERVER['HTTP_X_FORWARDED_PROTO'] ) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https'
+			) {
 				$protocol = 'https';
 			} else {
 				$protocol = 'http';
 			}
-			
+
 		}
-		
+
 		// Prevent XSS
 		$finalActionName = Xml::encodeJsVar( $finalActionName );
-		
+
 		// If $wgMatomoJSFileURL is null the locations are $wgMatomoURL/piwik.php and $wgMatomoURL/piwik.js
 		// Else they are $wgMatomoURL/piwik.php and $wgMatomoJSFileURL
 		$jsMatomoURL = '';
 		$jsMatomoURLCommon = '';
-		if( is_null( $jsFileURL ) ) {
+		if ( $jsFileURL === null ) {
 			$jsFileURL = 'piwik.js';
 			$jsMatomoURLCommon = '+' . Xml::encodeJsVar( $matomoURL . '/' );
 		} else {
@@ -220,7 +222,6 @@ class MatomoHooks {
 MATOMO;
 
 		return $script;
-		
 	}
-	
+
 }
