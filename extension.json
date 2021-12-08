@@ -30,17 +30,17 @@
 	},
 	"Hooks": {
 		"SkinAfterBottomScripts": [
-			"MatomoHooks::MatomoSetup"
+			"MediaWiki\\Extension\\Matomo\\Hooks::MatomoSetup"
 		],
 		"SpecialSearchResults": [
-			"MatomoHooks::onSpecialSearchResults"
+			"MediaWiki\\Extension\\Matomo\\Hooks::onSpecialSearchResults"
 		],
 		"SpecialSearchSetupEngine": [
-			"MatomoHooks::onSpecialSearchSetupEngine"
+			"MediaWiki\\Extension\\Matomo\\Hooks::onSpecialSearchSetupEngine"
 		]
 	},
 	"AutoloadClasses": {
-		"MatomoHooks": "Matomo.hooks.php"
+		"MediaWiki\\Extension\\Matomo\\Hooks": "src/Hooks.php"
 	},
 	"manifest_version": 1
 }
