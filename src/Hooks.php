@@ -1,6 +1,8 @@
 <?php
 
-class MatomoHooks {
+namespace MediaWiki\Extension\Matomo;
+
+class Hooks {
 
 	/** @var string|null Searched term in Special:Search. */
 	public static $searchTerm = null;

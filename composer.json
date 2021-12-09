@@ -42,9 +42,9 @@
 		"composer/installers": "1.*,>=1.0.1"
 	},
 	"autoload": {
-		"classmap": [
-			"Matomo.hooks.php"
-		]
+		"psr-4": {
+			"MediaWiki\\Extension\\Matomo\\": "src/"
+		}
 	},
 	"require-dev": {
 		"mediawiki/mediawiki-codesniffer": "38.0.0",
