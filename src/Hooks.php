@@ -2,6 +2,9 @@
 
 namespace MediaWiki\Extension\Matomo;
 
+use RequestContext;
+use Xml;
+
 class Hooks {
 
 	/** @var string|null Searched term in Special:Search. */
@@ -80,20 +83,20 @@ class Hooks {
 	 * @return string
 	 */
 	public static function addMatomo( $title ) {
-		global $wgUser;
 
+		$user = RequestContext::getMain()->getUser();
 		// Is Matomo disabled for bots?
-		if ( $wgUser->isAllowed( 'bot' ) && self::getParameter( 'IgnoreBots' ) ) {
+		if ( $user->isAllowed( 'bot' ) && self::getParameter( 'IgnoreBots' ) ) {
 			return '<!-- Matomo extension is disabled for bots -->';
 		}
 
 		// Ignore Wiki System Operators
-		if ( $wgUser->isAllowed( 'protect' ) && self::getParameter( 'IgnoreSysops' ) ) {
+		if ( $user->isAllowed( 'protect' ) && self::getParameter( 'IgnoreSysops' ) ) {
 			return '<!-- Matomo tracking is disabled for users with \'protect\' rights (i.e., sysops) -->';
 		}
 
 		// Ignore Wiki Editors
-		if ( $wgUser->isAllowed( 'edit' ) && self::getParameter( 'IgnoreEditors' ) ) {
+		if ( $user->isAllowed( 'edit' ) && self::getParameter( 'IgnoreEditors' ) ) {
 			return "<!-- Matomo tracking is disabled for users with 'edit' rights -->";
 		}
 
@@ -168,8 +171,8 @@ class Hooks {
 		// Track username based on https://matomo.org/docs/user-id/ The user
 		// name for anonymous visitors is their IP address which Matomo already
 		// records.
-		if ( self::getParameter( 'TrackUsernames' ) && $wgUser->isLoggedIn() ) {
-			$username = Xml::encodeJsVar( $wgUser->getName() );
+		if ( self::getParameter( 'TrackUsernames' ) && $user->isLoggedIn() ) {
+			$username = Xml::encodeJsVar( $user->getName() );
 			$customJs .= PHP_EOL . "  _paq.push([\"setUserId\",{$username}]);";
 		}
 
