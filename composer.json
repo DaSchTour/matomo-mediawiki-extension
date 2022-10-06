@@ -54,10 +54,7 @@
 	},
 	{
     	"config": {
-        	"allow-plugins": {
-            		"php-parallel-lint/php-parallel-lint": true,
-            		"php-parallel-lint/php-console-highlighter": true
-        		}
+        	"allow-plugins": true
     		}
 	}
 	"scripts": {
