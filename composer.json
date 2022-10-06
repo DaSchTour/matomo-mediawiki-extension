@@ -46,7 +46,6 @@
 			"MediaWiki\\Extension\\Matomo\\": "src/"
 		}
 	},
-	{
     	"config": {
         	"allow-plugins": true
     		}
