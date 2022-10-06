@@ -7,9 +7,6 @@ use Xml;
 
 class Hooks {
 
-	/** test edit to trigger CI */
-	public static $CITest = null;
-
 	/** @var string|null Searched term in Special:Search. */
 	public static $searchTerm = null;
 
