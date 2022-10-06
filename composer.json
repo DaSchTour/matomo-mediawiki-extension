@@ -45,6 +45,9 @@
 		"psr-4": {
 			"MediaWiki\\Extension\\Matomo\\": "src/"
 		}
+	},	
+    	"config": {
+        	"allow-plugins": true
 	},
 	"require-dev": {
 		"mediawiki/mediawiki-codesniffer": "38.0.0",
