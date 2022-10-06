@@ -48,7 +48,6 @@
 	},
     	"config": {
         	"allow-plugins": true
-    		}
 	}
 	"require-dev": {
 		"mediawiki/mediawiki-codesniffer": "38.0.0",
