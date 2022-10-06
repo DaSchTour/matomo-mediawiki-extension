@@ -9,7 +9,7 @@ class Hooks {
 
 	/** test edit to trigger CI */
 	public static $CITest = null;
-	
+
 	/** @var string|null Searched term in Special:Search. */
 	public static $searchTerm = null;
 
@@ -173,7 +173,7 @@ class Hooks {
 		// Track username based on https://matomo.org/docs/user-id/ The user
 		// name for anonymous visitors is their IP address which Matomo already
 		// records.
-		if ( self::getParameter( 'TrackUsernames' ) && ! $user->isAnon() ) {
+		if ( self::getParameter( 'TrackUsernames' ) && !$user->isAnon() ) {
 			$username = Xml::encodeJsVar( $user->getName() );
 			$customJs .= PHP_EOL . "  _paq.push([\"setUserId\",{$username}]);";
 		}
