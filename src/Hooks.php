@@ -38,10 +38,8 @@ class Hooks {
 		$config = \MediaWiki\MediaWikiServices::getInstance()->getMainConfig();
 		if ( $config->has( "Piwik$name" ) ) {
 			return $config->get( "Piwik$name" );
-		} elseif ( $config->has( "Matomo$name" ) ) {
-			return $config->get( "Matomo$name" );
 		}
-		return null;
+		return $config->get( "Matomo$name" );
 	}
 
 	/**
