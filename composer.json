@@ -46,6 +46,11 @@
 			"MediaWiki\\Extension\\Matomo\\": "src/"
 		}
 	},
+	"config": {
+		"allow-plugins": {
+			"composer/installers": true
+		}
+	},
 	"require-dev": {
 		"mediawiki/mediawiki-codesniffer": "38.0.0",
 		"mediawiki/minus-x": "1.1.1",
