@@ -17,6 +17,7 @@
 	"config": {
 		"MatomoIDSite": "",
 		"MatomoURL": "",
+		"MatomoIgnoreEditors": false,
 		"MatomoIgnoreSysops": true,
 		"MatomoIgnoreBots": true,
 		"MatomoCustomJS": "",
