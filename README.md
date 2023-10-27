@@ -1,21 +1,23 @@
 Mamoto extension for MediaWiki
 ==============================
-Version 4.0.1
- - Last update: 28 February 2019
+Version 5.0.0
+ - Last update: 27 October 2023
 
 This the Mamoto (ex-Piwik) integration extension for MediaWiki
 software. The extension is only useful if you've got a MediaWiki
 installation; it can only be installed by the administrator of the site.
 
 Minimum requirements
---------------------------------
+--------------------
 
-1.  MediaWiki 1.25+
+1.  MediaWiki 1.34+
 
 2.  A Matomo (0.4+) installation with the site configured
 
+
 Installation instructions
----------------------------------
+-------------------------
+
 Please, read them carefully. They're not very difficult to understand,
 but **ALL** steps are necessary:
 
@@ -45,7 +47,8 @@ but **ALL** steps are necessary:
 
 
 Custom variables
-------------------------
+----------------
+
 * Disable cookies by setting  the ```$wgMatomoDisableCookies``` variable to ```false```.
   > For example: $wgMatomoDisableCookies = false;
 
@@ -71,3 +74,9 @@ Custom variables
 
 * If you want to track the username of the visitor with the Matomo feature User ID (needs Matomo >= 2.7.0) 
   set the ```$wgMatomoTrackUsernames``` to true in LocalSettings.php.
+
+
+Troubleshooting
+---------------
+
+On MediaWiki 1.39.0–1.39.4 and 1.40.0, the tracking code is included twice: this can be fixed by upgrading MediaWiki to 1.39.5 and 1.40.1 (see this [Phabricator task](https://phabricator.wikimedia.org/T345039).

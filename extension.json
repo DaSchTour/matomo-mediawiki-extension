@@ -1,6 +1,6 @@
 {
 	"name": "Matomo",
-	"version": "4.0.1",
+	"version": "5.0.0",
 	"author": [
 		"Isb1009",
 		"[http://www.daschmedia.de DaSch]",
@@ -12,7 +12,7 @@
 	"license-name": "GPL-2.0-or-later",
 	"type": "other",
 	"requires": {
-		"MediaWiki": ">= 1.25.0"
+		"MediaWiki": ">= 1.34.0"
 	},
 	"config": {
 		"MatomoIDSite": "",
