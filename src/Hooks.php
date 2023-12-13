@@ -81,6 +81,11 @@ class Hooks {
 	 * @return string
 	 */
 	public static function addMatomo( $title ) {
+		static $called = false;
+
+		if($called) { return; }
+		$called = true;
+
 		$user = RequestContext::getMain()->getUser();
 		// Is Matomo disabled for bots?
 		if ( $user->isAllowed( 'bot' ) && self::getParameter( 'IgnoreBots' ) ) {
