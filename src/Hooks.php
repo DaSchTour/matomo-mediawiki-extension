@@ -81,6 +81,8 @@ class Hooks {
 	 * @return string
 	 */
 	public static function addMatomo( $title ) {
+		
+		// Fix #44. This function is being called twice from OutputPage (seems to be an upstream bug).
 		static $called = false;
 
 		if($called) { return; }
