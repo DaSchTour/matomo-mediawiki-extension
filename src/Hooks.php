@@ -3,6 +3,8 @@
 namespace MediaWiki\Extension\Matomo;
 
 use RequestContext;
+use Skin;
+use Title;
 use Xml;
 
 class Hooks {
@@ -19,7 +21,7 @@ class Hooks {
 	/**
 	 * Initialize the Matomo hook
 	 *
-	 * @param string $skin
+	 * @param Skin $skin
 	 * @param string &$text
 	 * @return bool
 	 */
@@ -77,7 +79,7 @@ class Hooks {
 
 	/**
 	 * Add Matomo script
-	 * @param string $title
+	 * @param Title $title
 	 * @return string
 	 */
 	public static function addMatomo( $title ) {
@@ -185,6 +187,15 @@ class Hooks {
 
 		}
 
+		$track404s = '';
+		if ( !$title->exists() ) {
+			$track404s = "_paq.push(["
+				. "'setDocumentTitle',"
+				. "'404/URL = ' +  encodeURIComponent(document.location.pathname+document.location.search)"
+				. " + '/From = ' + encodeURIComponent(document.referrer)"
+				. "]);";
+		}
+
 		// Prevent XSS
 		$finalActionName = Xml::encodeJsVar( $finalActionName );
 
@@ -205,6 +216,7 @@ class Hooks {
 <!-- Matomo -->
 <script type="text/javascript">
   var _paq = _paq || [];{$disableCookiesStr}{$customJs}
+  {$track404s}
   _paq.push(["{$trackingType}"{$jsTrackingSearch}]);
   _paq.push(["enableLinkTracking"]);
 
