@@ -3,7 +3,7 @@
 namespace MediaWiki\Extension\Matomo;
 
 use RequestContext;
-use Xml;
+use MediaWiki\Html\Html;
 
 class Hooks {
 
@@ -149,8 +149,8 @@ class Hooks {
 	if ( self::$searchTerm !== null ) {
 		// JavaScript
 		$trackingType = 'trackSiteSearch';
-		$jsTerm = Xml::encodeJsVar( self::$searchTerm );
-		$jsCategory = self::$searchProfile === null ? 'false' : Xml::encodeJsVar( self::$searchProfile );
+		$jsTerm = Html::encodeJsVar( self::$searchTerm );
+		$jsCategory = self::$searchProfile === null ? 'false' : Html::encodeJsVar( self::$searchProfile );
 		$jsResultsCount = self::$searchCount === null ? 'false' : self::$searchCount;
 		$jsTrackingSearch = ",$jsTerm,$jsCategory,$jsResultsCount";
 
@@ -169,7 +169,7 @@ class Hooks {
 		// name for anonymous visitors is their IP address which Matomo already
 		// records.
 		if ( self::getParameter( 'TrackUsernames' ) && $user->isRegistered() ) {
-			$username = Xml::encodeJsVar( $user->getName() );
+			$username = Html::encodeJsVar( $user->getName() );
 			$customJs .= PHP_EOL . "  _paq.push([\"setUserId\",{$username}]);";
 		}
 
@@ -186,7 +186,7 @@ class Hooks {
 		}
 
 		// Prevent XSS
-		$finalActionName = Xml::encodeJsVar( $finalActionName );
+		$finalActionName = Html::encodeJsVar( $finalActionName );
 
 		// If $wgMatomoJSFileURL is null the locations are $wgMatomoURL/piwik.php and $wgMatomoURL/piwik.js
 		// Else they are $wgMatomoURL/piwik.php and $wgMatomoJSFileURL
@@ -194,11 +194,11 @@ class Hooks {
 		$jsMatomoURLCommon = '';
 		if ( $jsFileURL === null ) {
 			$jsFileURL = 'piwik.js';
-			$jsMatomoURLCommon = '+' . Xml::encodeJsVar( $matomoURL . '/' );
+			$jsMatomoURLCommon = '+' . Html::encodeJsVar( $matomoURL . '/' );
 		} else {
-			$jsMatomoURL = '+' . Xml::encodeJsVar( $matomoURL . '/' );
+			$jsMatomoURL = '+' . Html::encodeJsVar( $matomoURL . '/' );
 		}
-		$jsMatomoJSFileURL = Xml::encodeJsVar( $jsFileURL );
+		$jsMatomoJSFileURL = Html::encodeJsVar( $jsFileURL );
 
 		// Matomo script
 		$script = <<<MATOMO
