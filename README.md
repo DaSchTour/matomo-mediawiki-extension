@@ -1,7 +1,7 @@
 Mamoto extension for MediaWiki
 ==============================
-Version 5.0.0
- - Last update: 27 October 2023
+Version 5.1.0
+ - Last update: 14 November 2025
 
 > **Note**: The maintainer of this extension recommends considering [Miraheze/MatomoAnalytics](https://github.com/Miraheze/MatomoAnalytics) as an actively maintained alternative for MediaWiki Matomo integration.
 
