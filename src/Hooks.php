@@ -2,8 +2,8 @@
 
 namespace MediaWiki\Extension\Matomo;
 
+use MediaWiki\Json\FormatJson;
 use RequestContext;
-use MediaWiki\Html\Html;
 
 class Hooks {
 
@@ -149,8 +149,8 @@ class Hooks {
 	if ( self::$searchTerm !== null ) {
 		// JavaScript
 		$trackingType = 'trackSiteSearch';
-		$jsTerm = Html::encodeJsVar( self::$searchTerm );
-		$jsCategory = self::$searchProfile === null ? 'false' : Html::encodeJsVar( self::$searchProfile );
+		$jsTerm = FormatJson::encode( self::$searchTerm );
+		$jsCategory = self::$searchProfile === null ? 'false' : FormatJson::encode( self::$searchProfile );
 		$jsResultsCount = self::$searchCount === null ? 'false' : self::$searchCount;
 		$jsTrackingSearch = ",$jsTerm,$jsCategory,$jsResultsCount";
 
@@ -169,7 +169,7 @@ class Hooks {
 		// name for anonymous visitors is their IP address which Matomo already
 		// records.
 		if ( self::getParameter( 'TrackUsernames' ) && $user->isRegistered() ) {
-			$username = Html::encodeJsVar( $user->getName() );
+			$username = FormatJson::encode( $user->getName() );
 			$customJs .= PHP_EOL . "  _paq.push([\"setUserId\",{$username}]);";
 		}
 
@@ -186,7 +186,7 @@ class Hooks {
 		}
 
 		// Prevent XSS
-		$finalActionName = Html::encodeJsVar( $finalActionName );
+		$finalActionName = FormatJson::encode( $finalActionName );
 
 		// If $wgMatomoJSFileURL is null the locations are $wgMatomoURL/piwik.php and $wgMatomoURL/piwik.js
 		// Else they are $wgMatomoURL/piwik.php and $wgMatomoJSFileURL
@@ -194,11 +194,11 @@ class Hooks {
 		$jsMatomoURLCommon = '';
 		if ( $jsFileURL === null ) {
 			$jsFileURL = 'piwik.js';
-			$jsMatomoURLCommon = '+' . Html::encodeJsVar( $matomoURL . '/' );
+			$jsMatomoURLCommon = '+' . FormatJson::encode( $matomoURL . '/' );
 		} else {
-			$jsMatomoURL = '+' . Html::encodeJsVar( $matomoURL . '/' );
+			$jsMatomoURL = '+' . FormatJson::encode( $matomoURL . '/' );
 		}
-		$jsMatomoJSFileURL = Html::encodeJsVar( $jsFileURL );
+		$jsMatomoJSFileURL = FormatJson::encode( $jsFileURL );
 
 		// Matomo script
 		$script = <<<MATOMO
