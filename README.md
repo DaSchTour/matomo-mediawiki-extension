@@ -1,5 +1,10 @@
 Mamoto extension for MediaWiki
 ==============================
+
+[![Latest Release](https://img.shields.io/github/v/release/DaSchTour/matomo-mediawiki-extension)](https://github.com/DaSchTour/matomo-mediawiki-extension/releases/latest)
+[![CI Status](https://github.com/DaSchTour/matomo-mediawiki-extension/workflows/CI/badge.svg)](https://github.com/DaSchTour/matomo-mediawiki-extension/actions)
+[![License](https://img.shields.io/github/license/DaSchTour/matomo-mediawiki-extension)](LICENSE)
+
 Version 5.0.0
  - Last update: 27 October 2023
 
@@ -18,12 +23,24 @@ Minimum requirements
 Installation instructions
 -------------------------
 
+### Option 1: Install from Release (Recommended)
+
+1. Download the latest release from the [Releases page](https://github.com/DaSchTour/matomo-mediawiki-extension/releases/latest)
+
+2. Extract the `matomo-mediawiki-extension-vX.Y.Z.zip` file
+
+3. Copy the `Matomo` folder to your MediaWiki `extensions` directory
+
+4. Continue with step 3 below (Edit LocalSettings.php)
+
+### Option 2: Manual Installation
+
 Please, read them carefully. They're not very difficult to understand,
 but **ALL** steps are necessary:
 
 1. Create a folder called "Matomo" in your extensions directory
 
-2. Upload extension.json and Matomo.hooks.php in the "Matomo" folder you've just created
+2. Upload extension.json and the src/ folder in the "Matomo" folder you've just created
 
 3. Edit your LocalSettings.php and, at the end of the file, add the
   following:

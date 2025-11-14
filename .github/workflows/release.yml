@@ -1,0 +1,110 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    name: Create Release
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        show-progress: false
+
+    - name: Set up PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '7.4'
+        coverage: none
+
+    - name: Install dependencies
+      run: |
+        composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader
+
+    - name: Create distribution package
+      run: |
+        # Create a clean directory for the distribution
+        mkdir -p dist/Matomo
+        
+        # Copy necessary files for MediaWiki extension
+        cp extension.json dist/Matomo/
+        cp README.md dist/Matomo/
+        cp -r src dist/Matomo/
+        cp -r vendor dist/Matomo/
+        
+        # Create archive
+        cd dist
+        zip -r ../matomo-mediawiki-extension-${GITHUB_REF_NAME}.zip Matomo
+        cd ..
+        
+        # Calculate checksum
+        sha256sum matomo-mediawiki-extension-${GITHUB_REF_NAME}.zip > matomo-mediawiki-extension-${GITHUB_REF_NAME}.zip.sha256
+
+    - name: Extract version from tag
+      id: version
+      run: echo "VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
+
+    - name: Generate release notes
+      id: release_notes
+      run: |
+        cat > release_notes.md << 'EOF'
+        ## Installation Instructions
+        
+        1. Download the `matomo-mediawiki-extension-${GITHUB_REF_NAME}.zip` file
+        2. Extract the archive
+        3. Copy the `Matomo` folder to your MediaWiki `extensions` directory
+        4. Add the following to your `LocalSettings.php`:
+           ```php
+           wfLoadExtension( 'Matomo' );
+           $wgMatomoURL = "matomo-host.tld/dir/";
+           $wgMatomoIDSite = "matomo_idsite";
+           ```
+        5. Configure as needed (see README.md for additional options)
+        
+        ## Files
+        
+        - `matomo-mediawiki-extension-${GITHUB_REF_NAME}.zip` - MediaWiki extension package
+        - `matomo-mediawiki-extension-${GITHUB_REF_NAME}.zip.sha256` - SHA256 checksum
+        
+        ## Verification
+        
+        Verify the download integrity:
+        ```bash
+        sha256sum -c matomo-mediawiki-extension-${GITHUB_REF_NAME}.zip.sha256
+        ```
+        
+        For full documentation, see [README.md](https://github.com/${{ github.repository }}/blob/${GITHUB_REF_NAME}/README.md)
+        EOF
+
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          matomo-mediawiki-extension-${{ github.ref_name }}.zip
+          matomo-mediawiki-extension-${{ github.ref_name }}.zip.sha256
+        body_path: release_notes.md
+        draft: false
+        prerelease: false
+        generate_release_notes: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Update release with full changelog
+      uses: softprops/action-gh-release@v1
+      with:
+        append_body: true
+        body: |
+          
+          ---
+          
+          **Full Changelog**: https://github.com/${{ github.repository }}/compare/v${{ steps.version.outputs.VERSION }}...${GITHUB_REF_NAME}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
