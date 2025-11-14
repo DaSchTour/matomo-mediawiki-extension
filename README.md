@@ -3,6 +3,8 @@ Mamoto extension for MediaWiki
 Version 5.0.0
  - Last update: 27 October 2023
 
+> **Note**: The maintainer of this extension recommends considering [Miraheze/MatomoAnalytics](https://github.com/Miraheze/MatomoAnalytics) as an actively maintained alternative for MediaWiki Matomo integration.
+
 This the Mamoto (ex-Piwik) integration extension for MediaWiki
 software. The extension is only useful if you've got a MediaWiki
 installation; it can only be installed by the administrator of the site.
