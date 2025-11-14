@@ -2,8 +2,8 @@
 
 namespace MediaWiki\Extension\Matomo;
 
-use RequestContext;
 use MediaWiki\Html\Html;
+use RequestContext;
 
 class Hooks {
 
