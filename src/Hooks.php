@@ -24,7 +24,10 @@ class Hooks {
 	 * @return bool
 	 */
 	public static function MatomoSetup( $skin, &$text = '' ) {
-		$text .= self::addMatomo( $skin->getTitle() );
+		if (!str_contains($text, 'Matomo')) {
+			$text .= self::addMatomo( $skin->getTitle() );
+		}
+
 		return true;
 	}
 
